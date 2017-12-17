@@ -3,40 +3,54 @@
 #include <d3dx11.h>
 #include <dxerr.h>
 #include <stdio.h>
+#include"Model.h"
+#include "camera.h"
+#include <dinput.h>  //for input
 #define _XM_NO_INTRINSICS_
 #define XM_NO_ALIGNMENT
 #include <xnamath.h>
-#include"Model.h"
-#include "camera.h"
+
 
 int (WINAPIV * __vsnprintf_s)(char *, size_t, const char*, va_list) = _vsnprintf;
 
-D3D_DRIVER_TYPE         g_driverType = D3D_DRIVER_TYPE_NULL;
-D3D_FEATURE_LEVEL       g_featureLevel = D3D_FEATURE_LEVEL_11_0;
-ID3D11Device*           g_pD3DDevice = NULL;
-ID3D11DeviceContext*    g_pImmediateContext = NULL;
-IDXGISwapChain*         g_pSwapChain = NULL;
-ID3D11RenderTargetView* g_pBackBufferRTView = NULL;
 
-ID3D11Buffer* g_pVertexBuffer;
-ID3D11VertexShader* g_pVertexShader;
-ID3D11PixelShader* g_pPixelShader;
-ID3D11InputLayout* g_pInputLayout;
+///////////////////////////
+//	Global Variables
+//////////////////////////////
 
-ID3D11Buffer*  g_pConstantBuffer0;
+D3D_DRIVER_TYPE				g_driverType = D3D_DRIVER_TYPE_NULL;
+D3D_FEATURE_LEVEL			g_featureLevel = D3D_FEATURE_LEVEL_11_0;
+ID3D11Device*				g_pD3DDevice = NULL;
+ID3D11DeviceContext*		g_pImmediateContext = NULL;
+IDXGISwapChain*				g_pSwapChain = NULL;
+ID3D11RenderTargetView*		g_pBackBufferRTView = NULL;
 
-ID3D11DepthStencilView* g_pZBuffer;
+//adding vertex buffer and shader, pixel shader and input layout
+ID3D11Buffer*				g_pVertexBuffer;
+ID3D11VertexShader*			g_pVertexShader;
+ID3D11PixelShader*			g_pPixelShader;
+ID3D11InputLayout*			g_pInputLayout;
 
-ID3D11ShaderResourceView* g_pTexture_cube; 
-ID3D11ShaderResourceView* g_pTexture_sphere;
-ID3D11SamplerState*   g_pSampler;
+//adding constant buffer and z buffer
+ID3D11Buffer*				g_pConstantBuffer0;
+ID3D11DepthStencilView*     g_pZBuffer;
 
+//adding textures and sampler
+ID3D11ShaderResourceView*   g_pTexture_cube; 
+ID3D11ShaderResourceView*   g_pTexture_sphere;
+ID3D11SamplerState*         g_pSampler;
 
+//adding model source file
+Model*                      g_model_cube;
+Model*                      g_model_sphere;
 
+//adding camera source file
+camera*						camera1;
 
-Model* g_model_cube;
-Model* g_model_sphere;
-
+//adding input
+IDirectInput8*			    g_direct_input;
+IDirectInputDevice8*	    g_Keyboard_device;
+unsigned char			    g_keyboard_keys_state[256];
 
 
 //define vertex structure
@@ -75,9 +89,16 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 //CONSTANT_BUFFER0 cb0_values;
 //CONSTANT_BUFFER0 cb0_values2;
 
+HRESULT Initialise_Input();
+void ReadInputStates();
+bool IsKeyPressed(unsigned char DI_keycode);
+void Key_Logic();
 
+HRESULT InitialiseD3D();
+void RenderFrame(void);
+void ShutdownD3D();
 
-//////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 // Create D3D device and swap chain
 //////////////////////////////////////////////////////////////////////////////////////
 HRESULT InitialiseD3D()
@@ -205,42 +226,54 @@ HRESULT InitialiseD3D()
 	return S_OK;
 }
 
-void RenderFrame(void);
-
 //////////////////////////////////////////////////////////////////////////////////////
 // Clean up D3D objects
 //////////////////////////////////////////////////////////////////////////////////////
 void ShutdownD3D()
 {
-	if (g_pVertexBuffer) g_pVertexBuffer->Release(); //03-01
-	if (g_pInputLayout)g_pInputLayout->Release(); //03-01
-	if (g_pVertexShader)g_pVertexShader->Release(); //03-01
-	if (g_pPixelShader)g_pPixelShader->Release(); //03-01
+	//deleting vertex buffer , input layout,vertex shader , pixel shader
+	if (g_pVertexBuffer) g_pVertexBuffer->Release(); 
+	if (g_pInputLayout)g_pInputLayout->Release(); 
+	if (g_pVertexShader)g_pVertexShader->Release(); 
+	if (g_pPixelShader)g_pPixelShader->Release(); 
 
-
+	//delete back bufferTRview
 	if (g_pBackBufferRTView) g_pBackBufferRTView->Release();
 
+	//delete swapchain , constan buffer, immediat context
 	if (g_pSwapChain) g_pSwapChain->Release();
 	if (g_pConstantBuffer0) g_pConstantBuffer0->Release();
 	if (g_pImmediateContext) g_pImmediateContext->Release();
 
+	//delete objects
 	delete g_model_cube;
 	delete g_model_sphere;
+	//delete camera
+	delete camera1;
 
+
+	//delete keyboard 
+	if (g_Keyboard_device)
+	{
+		g_Keyboard_device->Unacquire();
+		g_Keyboard_device->Release();
+	}
+
+	
+
+	//delete input
+	if (g_direct_input)g_direct_input->Release();
+
+	//delete model objects texture
 	if (g_pTexture_cube)  g_pTexture_cube->Release();
 	if (g_pTexture_sphere)  g_pTexture_sphere->Release();
+
+	//delete sampler
 	if (g_pSampler)  g_pSampler->Release();
 
-
+	//delete this project
 	if (g_pD3DDevice) g_pD3DDevice->Release();
 }
-
-
-HRESULT InitialiseD3D();
-void ShutdownD3D();
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////
 // Entry point to the program. Initializes everything and goes into a message processing 
@@ -254,6 +287,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (FAILED(InitialiseWindow(hInstance, nCmdShow)))
 	{
 		DXTRACE_MSG("Failed to create Window");
+		return 0;
+	}
+
+	if (FAILED(Initialise_Input()))
+	{
+		DXTRACE_MSG("Failed to create Input");
 		return 0;
 	}
 
@@ -289,6 +328,86 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	ShutdownD3D();
 	return (int)msg.wParam;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Initialise input 
+//////////////////////////////////////////////////////////////////////////////////////
+HRESULT Initialise_Input()
+{
+	HRESULT hr;
+	ZeroMemory(g_keyboard_keys_state, sizeof(g_keyboard_keys_state));
+
+	hr = DirectInput8Create(g_hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&g_direct_input, NULL);
+	if (FAILED(hr)) return hr;
+
+	hr = g_direct_input->CreateDevice(GUID_SysKeyboard, &g_Keyboard_device, NULL);
+	if (FAILED(hr)) return hr;
+
+	hr = g_Keyboard_device->SetDataFormat(&c_dfDIKeyboard);
+	if (FAILED(hr)) return hr;
+
+	hr = g_Keyboard_device->SetCooperativeLevel(g_hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	if (FAILED(hr)) return hr;
+
+	hr = g_Keyboard_device->Acquire();
+	if (FAILED(hr)) return hr;
+
+	return S_OK;
+}
+
+void ReadInputStates()   //void means dont return anything
+{
+	HRESULT hr;
+	hr = g_Keyboard_device->GetDeviceState(sizeof(g_keyboard_keys_state), (LPVOID)&g_keyboard_keys_state);
+
+	if (FAILED(hr))
+	{
+		if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED))
+			g_Keyboard_device->Acquire();
+	}
+}
+
+bool IsKeyPressed(unsigned char DI_keycode)
+{
+	return g_keyboard_keys_state[DI_keycode] & 0x80;
+}
+
+
+void Key_Logic()
+{
+	//close the program
+	if (IsKeyPressed(DIK_ESCAPE))
+		DestroyWindow(g_hWnd);
+
+	//change positions
+	if (IsKeyPressed(DIK_D))
+		g_model_cube->SetXPos(0.0005f);
+	if (IsKeyPressed(DIK_A))
+		g_model_cube->SetXPos(-0.0005f);
+	if (IsKeyPressed(DIK_W))
+		g_model_cube->SetYPos(0.0005f);
+	if (IsKeyPressed(DIK_S))
+		g_model_cube->SetYPos(-0.0005f);
+
+	//position z
+	if (IsKeyPressed(DIK_UP))
+		g_model_cube->SetZPos(0.0005f);
+	if (IsKeyPressed(DIK_DOWN))
+		g_model_cube->SetZPos(-0.0005f);
+
+	//change rotation
+	if (IsKeyPressed(DIK_LEFT))
+		g_model_cube->SetXRot(3.0f);
+	if (IsKeyPressed(DIK_RIGHT))
+		g_model_cube->SetYRot(0.0005f);
+
+	//change scale
+	if (IsKeyPressed(DIK_0))
+		g_model_cube->SetScale(0.0005f);
+	if (IsKeyPressed(DIK_1))
+		g_model_cube->SetScale(-0.0005f);
+
 }
 
 
@@ -366,9 +485,11 @@ HRESULT InitialiseGraphics()
 {
 	HRESULT hr = S_OK;
 
+	//load model cube
 	g_model_cube = new Model(g_pD3DDevice, g_pImmediateContext,-10,0,30);
 	g_model_cube->LoadObjModel("assets/cube.obj");
 
+	//load model sphere
 	g_model_sphere = new Model(g_pD3DDevice, g_pImmediateContext,10,0,30);
 	g_model_sphere->LoadObjModel("assets/sphere.obj");
 
@@ -394,6 +515,8 @@ HRESULT InitialiseGraphics()
 
 	g_pD3DDevice->CreateSamplerState(&sampler_desc, &g_pSampler);
 
+	// adding the camera and values 
+	camera1 = new camera(0.0f, 0.0f, -0.5, 0.0f);
 
 	//adding the texture from the assets file
 	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/cube.jpg", NULL, NULL, &g_pTexture_cube, NULL);
@@ -421,17 +544,34 @@ void RenderFrame(void)
 	g_pImmediateContext->ClearRenderTargetView(g_pBackBufferRTView, rgba_clear_colour);
 	g_pImmediateContext->ClearDepthStencilView(g_pZBuffer, D3D11_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0);
 
+
+	//read input
+	ReadInputStates();
+	Key_Logic();
+
+
+
 	// RENDER HERE
 	XMMATRIX projection, world, view;
-	
 	projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0), 640.0 / 480.0, 1.0f, 100.0f);
-
 	g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//view = XMMatrixIdentity();
 
-   
+	//use the camera to view
+	view = camera1->GetViewMatrix();
 
 
-	view = XMMatrixIdentity();
+	g_model_sphere->LookAt_XZ(g_model_cube->GetXPos(), g_model_cube->GetZPos());
+	g_model_sphere->MoveForward(0.0001f);
+	if (g_model_sphere->CheckCollision(g_model_cube))
+		g_model_sphere->MoveForward(-0.5f);
+
+	//g_model2->LookAt_XZ(g_model->GetXPos(), g_model->GetZPos());
+	//g_model2->MoveForward(0.0001f);
+	//if (g_model2->CheckCollision(g_model))
+	//	g_model2->MoveForward(-0.1f);
+
+
 	g_model_cube->Draw(&view, &projection);
 	g_model_sphere->Draw(&view, &projection);
 
