@@ -15,6 +15,8 @@ private:
 	float m_dz;
 	float m_camera_rotation;
 
+	float m_xangle, m_zangle, m_yangle;
+
 
 	XMVECTOR  m_position;
 	XMVECTOR  m_lookat;
@@ -31,6 +33,9 @@ public:
 
 	//Create Forward method that has one floating point parameter  
 	void Forward(float distance);
+
+
+	void LookAt_XZ(float x, float z);
 
 	//Create Up method that has one floating point parameter
 	void Up(float heigh);

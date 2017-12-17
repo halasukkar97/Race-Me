@@ -6,7 +6,7 @@ Model::Model(ID3D11Device * Device, ID3D11DeviceContext * Context,float x, float
 	m_x = x;
 	m_y = y;
 	m_z = z;
-	m_xangle = 0.0f;
+	m_xangle = 80.0f;
 	m_zangle = 0.0f;
 	m_yangle = 0.0f;
 	m_scale = 1.0f;
@@ -14,7 +14,8 @@ Model::Model(ID3D11Device * Device, ID3D11DeviceContext * Context,float x, float
 
 	m_pD3DDevice = Device;
 	m_pImmediateContext = Context;
-
+	
+	m_Draw = true;
 
 }
 
@@ -284,6 +285,7 @@ void Model::Draw(XMMATRIX* view, XMMATRIX* projection)
 	m_pImmediateContext->PSSetSamplers(0, 1, &m_pSampler0);
 	m_pImmediateContext->PSSetShaderResources(0, 1,&m_pTexture);
 
+
 	m_pObject->Draw();
 }
 
@@ -321,3 +323,6 @@ float Model::GetBoundingSphereCentreX() { return m_bounding_sphere_centre_x; }
 float Model::GetBoundingSphereCentreY() { return m_bounding_sphere_centre_y; }
 float Model::GetBoundingSphereCentreZ() { return m_bounding_sphere_centre_z; }
 float Model::GetBoundingSphereRadius() { return m_radius; }
+
+void Model::SetDraw(bool draw_gold){m_Draw = draw_gold;}
+bool Model::GetDraw() {	return m_Draw;}

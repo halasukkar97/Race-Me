@@ -9,6 +9,10 @@ camera::camera(float x_position, float y_position, float z_position, float camer
 	m_z = z_position;
 	m_camera_rotation= camera_rotation;
 
+	m_xangle = 0.0f;
+	m_zangle = 0.0f;
+	m_yangle = 0.0f;
+
 	m_dx = sin(m_camera_rotation *(XM_PI / 180.0));
 	m_dz = cos(m_camera_rotation *(XM_PI / 180.0));
 }
@@ -33,6 +37,23 @@ void camera::Forward(float distance)
 	m_z += m_dz * distance;
 
 }
+
+void camera::LookAt_XZ(float x, float z)
+{
+
+	//calculate dx and dz between the object and the look at position passed in.
+	float DX = x - m_x;
+	float DZ = z - m_z;
+
+	//update m_yangle using the arctangent calculation and converting to degrees.
+	float f = m_yangle;
+	m_yangle = atan2(DX, DZ) * (180.0 / XM_PI);
+
+	m_lookat = XMVectorSet(m_x + DX, m_y, m_z + DZ, 0.0);
+	Rotate(m_yangle-f);
+}
+
+
 
 void camera::Up(float heigh)
 {

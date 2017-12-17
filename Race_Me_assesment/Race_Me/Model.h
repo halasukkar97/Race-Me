@@ -51,6 +51,10 @@ public:
 	float GetBoundingSphereCentreZ();
 	float GetBoundingSphereRadius();
 
+	bool GetDraw();
+	void SetDraw(bool draw_gold);
+	
+
 
 private:
 	ID3D11Device* m_pD3DDevice;
@@ -93,6 +97,7 @@ private:
 	void CalculateModelCentrePoint();
 	void CalculateBoundingSphereRadius();
 
-	
+	bool m_Draw;
+
 	
 };

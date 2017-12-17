@@ -36,16 +36,24 @@ ID3D11Buffer*				g_pConstantBuffer0;
 ID3D11DepthStencilView*     g_pZBuffer;
 
 //adding textures and sampler
-ID3D11ShaderResourceView*   g_pTexture_cube; 
-ID3D11ShaderResourceView*   g_pTexture_sphere;
+ID3D11ShaderResourceView*   g_pTexture_player; 
+ID3D11ShaderResourceView*   g_pTexture_ai;
+ID3D11ShaderResourceView*   g_pTexture_gold;
+ID3D11ShaderResourceView*   g_pTexture_tree;
+ID3D11ShaderResourceView*   g_pTexture_flag;
 ID3D11SamplerState*         g_pSampler;
 
 //adding model source file
-Model*                      g_model_cube;
-Model*                      g_model_sphere;
+Model*                      g_model_player;
+Model*                      g_model_ai;
+Model*                      g_model_flag;
+Model*                      g_model_gold[15];
+Model*                      g_model_tree[20];
 
 //adding camera source file
 camera*						camera1;
+
+
 
 //adding input
 IDirectInput8*			    g_direct_input;
@@ -98,6 +106,7 @@ HRESULT InitialiseD3D();
 void RenderFrame(void);
 void ShutdownD3D();
 
+int  money = 0;
 ///////////////////////////////////////////////////////////////////////////////////
 // Create D3D device and swap chain
 //////////////////////////////////////////////////////////////////////////////////////
@@ -246,8 +255,22 @@ void ShutdownD3D()
 	if (g_pImmediateContext) g_pImmediateContext->Release();
 
 	//delete objects
-	delete g_model_cube;
-	delete g_model_sphere;
+	delete g_model_player;
+	delete g_model_ai;
+	delete g_model_flag;
+
+	for (int i = 0; i < 15; i++)
+	{
+		delete g_model_gold[i];
+	}
+
+
+	for (int i = 0; i < 20; i++)
+	{
+		delete g_model_tree[i];
+	}
+
+
 	//delete camera
 	delete camera1;
 
@@ -265,9 +288,13 @@ void ShutdownD3D()
 	if (g_direct_input)g_direct_input->Release();
 
 	//delete model objects texture
-	if (g_pTexture_cube)  g_pTexture_cube->Release();
-	if (g_pTexture_sphere)  g_pTexture_sphere->Release();
+	if (g_pTexture_player)  g_pTexture_player->Release();
+	if (g_pTexture_ai)  g_pTexture_ai->Release();
+	if (g_pTexture_flag)  g_pTexture_flag->Release();
+	if (g_pTexture_gold)  g_pTexture_gold->Release();
+	if (g_pTexture_tree)  g_pTexture_tree->Release();
 
+	
 	//delete sampler
 	if (g_pSampler)  g_pSampler->Release();
 
@@ -380,33 +407,47 @@ void Key_Logic()
 	if (IsKeyPressed(DIK_ESCAPE))
 		DestroyWindow(g_hWnd);
 
-	//change positions
+	//change positions X,Z
 	if (IsKeyPressed(DIK_D))
-		g_model_cube->SetXPos(0.0005f);
+	{
+		g_model_player->SetXPos(0.005f);
+		
+	}
 	if (IsKeyPressed(DIK_A))
-		g_model_cube->SetXPos(-0.0005f);
+	{
+		g_model_player->SetXPos(-0.005f);
+		
+	}
 	if (IsKeyPressed(DIK_W))
-		g_model_cube->SetYPos(0.0005f);
+	{
+		g_model_player->SetZPos(0.005f);
+		camera1->Forward(0.005f);
+	}
 	if (IsKeyPressed(DIK_S))
-		g_model_cube->SetYPos(-0.0005f);
+	{
+		g_model_player->SetZPos(-0.005f);
+		camera1->Forward(-0.005f);
+	}
+		
+	
 
-	//position z
+	//position y
 	if (IsKeyPressed(DIK_UP))
-		g_model_cube->SetZPos(0.0005f);
+		g_model_player->SetYPos(0.005f);
 	if (IsKeyPressed(DIK_DOWN))
-		g_model_cube->SetZPos(-0.0005f);
+		g_model_player->SetYPos(-0.005f);
 
 	//change rotation
 	if (IsKeyPressed(DIK_LEFT))
-		g_model_cube->SetXRot(3.0f);
+		g_model_player->SetXRot(0.005f);
 	if (IsKeyPressed(DIK_RIGHT))
-		g_model_cube->SetYRot(0.0005f);
+		g_model_player->SetYRot(0.005f);
 
 	//change scale
 	if (IsKeyPressed(DIK_0))
-		g_model_cube->SetScale(0.0005f);
+		g_model_player->SetScale(0.0005f);
 	if (IsKeyPressed(DIK_1))
-		g_model_cube->SetScale(-0.0005f);
+		g_model_player->SetScale(-0.0005f);
 
 }
 
@@ -485,13 +526,31 @@ HRESULT InitialiseGraphics()
 {
 	HRESULT hr = S_OK;
 
-	//load model cube
-	g_model_cube = new Model(g_pD3DDevice, g_pImmediateContext,-10,0,30);
-	g_model_cube->LoadObjModel("assets/cube.obj");
+	//load model player
+	g_model_player = new Model(g_pD3DDevice, g_pImmediateContext,0,0,0);
+	g_model_player->LoadObjModel("assets/cube.obj");
 
 	//load model sphere
-	g_model_sphere = new Model(g_pD3DDevice, g_pImmediateContext,10,0,30);
-	g_model_sphere->LoadObjModel("assets/sphere.obj");
+	g_model_ai= new Model(g_pD3DDevice, g_pImmediateContext,10,0,30);
+	g_model_ai->LoadObjModel("assets/cube.obj");
+
+	//load flag
+	g_model_flag = new Model(g_pD3DDevice, g_pImmediateContext, rand() % 100, 0, rand() % 100);
+	g_model_flag->LoadObjModel("assets/cube.obj");
+
+
+	//load model gold
+	for (int i = 0; i < 15; i++)
+	{
+		g_model_gold[i] = new Model(g_pD3DDevice, g_pImmediateContext, rand() % 100, 0, rand() % 100);
+		g_model_gold[i]->LoadObjModel("assets/cube.obj");
+	}
+
+	for (int i = 0; i < 20; i++)
+	{
+		g_model_tree[i] = new Model(g_pD3DDevice, g_pImmediateContext, rand() % 100, 0, rand() % 100);
+		g_model_tree[i]->LoadObjModel("assets/cube.obj");
+	}
 
 	////create constant buffer //04-1
 	//D3D11_BUFFER_DESC constant_buffer_desc;
@@ -516,19 +575,45 @@ HRESULT InitialiseGraphics()
 	g_pD3DDevice->CreateSamplerState(&sampler_desc, &g_pSampler);
 
 	// adding the camera and values 
-	camera1 = new camera(0.0f, 0.0f, -0.5, 0.0f);
+	camera1 = new camera(0, 5, -15, 0);
 
 	//adding the texture from the assets file
-	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/cube.jpg", NULL, NULL, &g_pTexture_cube, NULL);
-	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/sphere.jpg", NULL, NULL, &g_pTexture_sphere, NULL);
+	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/playerCar.jpg", NULL, NULL, &g_pTexture_player, NULL);
+	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/aiCar.png", NULL, NULL, &g_pTexture_ai, NULL);
+	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/gold.jpg", NULL, NULL, &g_pTexture_gold, NULL);
+	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/tree.jpg", NULL, NULL, &g_pTexture_tree, NULL);
+	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/endpoint.png", NULL, NULL, &g_pTexture_flag, NULL);
 
 	//set the samplers
-	g_model_cube->set_sampler(g_pSampler);
-	g_model_sphere->set_sampler(g_pSampler);
+	g_model_player->set_sampler(g_pSampler);
+	g_model_ai->set_sampler(g_pSampler);
+	g_model_flag->set_sampler(g_pSampler);
+	
+	for (int i = 0; i < 15; i++)
+	{
+		g_model_gold[i]->set_sampler(g_pSampler);
+	}
+
+	for (int i = 0; i < 20; i++)
+	{
+		g_model_tree[i]->set_sampler(g_pSampler);
+	}
 
 	// setting the textures
-	g_model_cube->set_texture(g_pTexture_cube);
-	g_model_sphere->set_texture(g_pTexture_sphere);
+	g_model_player->set_texture(g_pTexture_player);
+	g_model_ai->set_texture(g_pTexture_ai);
+	g_model_flag->set_texture(g_pTexture_flag);
+	
+	for (int i = 0; i < 15; i++)
+	{
+		g_model_gold[i]->set_texture(g_pTexture_gold);
+	}
+
+	for (int i = 0; i < 20; i++)
+	{
+		g_model_tree[i]->set_texture(g_pTexture_tree);
+	}
+
 
 	//copy the vertices into the buffer
 	D3D11_MAPPED_SUBRESOURCE ms;
@@ -561,19 +646,52 @@ void RenderFrame(void)
 	view = camera1->GetViewMatrix();
 
 
-	g_model_sphere->LookAt_XZ(g_model_cube->GetXPos(), g_model_cube->GetZPos());
-	g_model_sphere->MoveForward(0.0001f);
-	if (g_model_sphere->CheckCollision(g_model_cube))
-		g_model_sphere->MoveForward(-0.5f);
+	g_model_ai->LookAt_XZ(g_model_flag->GetXPos(), g_model_flag->GetZPos());
+	g_model_ai->MoveForward(0.001f);
+	
+	camera1->LookAt_XZ(g_model_player->GetXPos(), g_model_player->GetZPos());
 
-	//g_model2->LookAt_XZ(g_model->GetXPos(), g_model->GetZPos());
-	//g_model2->MoveForward(0.0001f);
-	//if (g_model2->CheckCollision(g_model))
-	//	g_model2->MoveForward(-0.1f);
+	if (g_model_ai->CheckCollision(g_model_player))
+		g_model_ai->MoveForward(-0.5f);
+
+	if (g_model_flag->CheckCollision(g_model_ai))
+		g_model_ai->MoveForward(-0.5f);
 
 
-	g_model_cube->Draw(&view, &projection);
-	g_model_sphere->Draw(&view, &projection);
+	if (g_model_flag->CheckCollision(g_model_player))
+		g_model_player->MoveForward(-0.5f);
+
+
+
+	for (int i = 0; i < 15; i++)
+	{
+		if (g_model_gold[i]->CheckCollision(g_model_player))
+		{
+			money += 1;
+			g_model_gold[i]->SetDraw(false);
+		}
+	}
+
+	
+	for (int i = 0; i < 20; i++)
+	{
+		if (g_model_tree[i]->CheckCollision(g_model_player))
+		{
+			g_model_player->MoveForward(-0.5f);
+		}
+	}
+
+
+
+	g_model_player->Draw(&view, &projection);
+	g_model_ai->Draw(&view, &projection);
+	g_model_flag->Draw(&view, &projection);
+
+	for (int i = 0; i < 15; i++){if (g_model_gold[i]->GetDraw() == true){g_model_gold[i]->Draw(&view, &projection);}}
+	for (int i = 0; i < 20; i++){	g_model_tree[i]->Draw(&view, &projection);}
+
+	
+
 
 	// Display what has just been rendered
 	g_pSwapChain->Present(0, 0);
