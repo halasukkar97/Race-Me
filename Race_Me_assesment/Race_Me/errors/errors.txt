@@ -1,0 +1,4 @@
+adding input   =================   adding the liberys in propirty inker
+loading model ================= add InitialiseGraphics in winmain
+adding camera =================== in the deleting setions i deleted the camera then the input
+error with rotation ===================== in world view matrix the order was wrong
