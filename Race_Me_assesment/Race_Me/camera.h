@@ -21,6 +21,8 @@ private:
 	XMVECTOR  m_position;
 	XMVECTOR  m_lookat;
 	XMVECTOR  m_up;
+
+	bool m_StopCameraAi;
 public:
 
 	//a constructor that has 4 parameters
@@ -47,5 +49,7 @@ public:
 	//create GetViewMatrix method when it says return XMMATRIX that means use the type insted of void 
 	XMMATRIX GetViewMatrix();
 
+	bool GeCameraAI();
+	void SetCameraAI(bool Stop_camera_ai);
 
 };

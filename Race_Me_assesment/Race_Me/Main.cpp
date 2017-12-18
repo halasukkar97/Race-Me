@@ -6,7 +6,8 @@
 #include"Model.h"
 #include "camera.h"
 #include "text2D.h"
-#include <dinput.h>  //for input
+#include "Input.h"
+
 #define _XM_NO_INTRINSICS_
 #define XM_NO_ALIGNMENT
 #include <xnamath.h>
@@ -22,53 +23,14 @@ int (WINAPIV * __vsnprintf_s)(char *, size_t, const char*, va_list) = _vsnprintf
 D3D_DRIVER_TYPE				g_driverType = D3D_DRIVER_TYPE_NULL;
 D3D_FEATURE_LEVEL			g_featureLevel = D3D_FEATURE_LEVEL_11_0;
 ID3D11Device*				g_pD3DDevice = NULL;
-ID3D11DeviceContext*		g_pImmediateContext = NULL;
-IDXGISwapChain*				g_pSwapChain = NULL;
-ID3D11RenderTargetView*		g_pBackBufferRTView = NULL;
-
-//adding vertex buffer and shader, pixel shader and input layout
-ID3D11Buffer*				g_pVertexBuffer;
-ID3D11VertexShader*			g_pVertexShader;
-ID3D11PixelShader*			g_pPixelShader;
-ID3D11InputLayout*			g_pInputLayout;
-
-//adding constant buffer and z buffer
-ID3D11Buffer*				g_pConstantBuffer0;
-ID3D11DepthStencilView*     g_pZBuffer;
-
-//adding textures and sampler
-ID3D11ShaderResourceView*   g_pTexture_player; 
-ID3D11ShaderResourceView*   g_pTexture_ai;
-ID3D11ShaderResourceView*   g_pTexture_gold;
-ID3D11ShaderResourceView*   g_pTexture_tree;
-ID3D11ShaderResourceView*   g_pTexture_flag;
-ID3D11SamplerState*         g_pSampler;
-
-//adding model source file
-Model*                      g_model_player;
-Model*                      g_model_ai;
-Model*                      g_model_flag;
-Model*                      g_model_gold[50];
-Model*                      g_model_tree[40];
-
-//adding camera source file
-camera*						camera_player;
-camera*						camera_ai;
-
-//adding text
-Text2D* g_timer;
-Text2D* g_moneyCount;
-
-//adding lights
-XMVECTOR g_directionla_light_shines_from;
-XMVECTOR g_directional_light_colour;
-XMVECTOR g_ambient_light_colour;
 
 
-//adding input
-IDirectInput8*			    g_direct_input;
-IDirectInputDevice8*	    g_Keyboard_device;
-unsigned char			    g_keyboard_keys_state[256];
+
+
+Input*                       input;
+
+
+
 
 
 //define vertex structure
@@ -107,18 +69,12 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 CONSTANT_BUFFER0 cb_values;
 CONSTANT_BUFFER0 cb_values2;
 
-HRESULT Initialise_Input();
-void ReadInputStates();
-bool IsKeyPressed(unsigned char DI_keycode);
-void Key_Logic();
 
 HRESULT InitialiseD3D();
-void RenderFrame(void);
+
 void ShutdownD3D();
 
-int  money = 0;
 
-XMMATRIX projection, world, view;
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Create D3D device and swap chain
@@ -246,9 +202,9 @@ HRESULT InitialiseD3D()
 	g_pImmediateContext->RSSetViewports(1, &viewport);
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	/*g_timer = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
+	g_timer = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
 	g_moneyCount = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
-*/
+
 
 	return S_OK;
 }
@@ -298,16 +254,16 @@ void ShutdownD3D()
 	delete g_moneyCount;
 
 	//delete keyboard 
-	if (g_Keyboard_device)
+	if (_Input->g_Keyboard_device)
 	{
-		g_Keyboard_device->Unacquire();
-		g_Keyboard_device->Release();
+		_Input->g_Keyboard_device->Unacquire();
+		_Input->g_Keyboard_device->Release();
 	}
 
 	
 
 	//delete input
-	if (g_direct_input)g_direct_input->Release();
+	if (_Input->g_direct_input)_Input->g_direct_input->Release();
 
 	//delete model objects texture
 	if (g_pTexture_player)  g_pTexture_player->Release();
@@ -339,7 +295,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
-	if (FAILED(Initialise_Input()))
+	if (FAILED(_Input->Initialise_Input()))
 	{
 		DXTRACE_MSG("Failed to create Input");
 		return 0;
@@ -377,117 +333,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	ShutdownD3D();
 	return (int)msg.wParam;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-// Initialise input 
-//////////////////////////////////////////////////////////////////////////////////////
-HRESULT Initialise_Input()
-{
-	HRESULT hr;
-	ZeroMemory(g_keyboard_keys_state, sizeof(g_keyboard_keys_state));
-
-	hr = DirectInput8Create(g_hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&g_direct_input, NULL);
-	if (FAILED(hr)) return hr;
-
-	hr = g_direct_input->CreateDevice(GUID_SysKeyboard, &g_Keyboard_device, NULL);
-	if (FAILED(hr)) return hr;
-
-	hr = g_Keyboard_device->SetDataFormat(&c_dfDIKeyboard);
-	if (FAILED(hr)) return hr;
-
-	hr = g_Keyboard_device->SetCooperativeLevel(g_hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-	if (FAILED(hr)) return hr;
-
-	hr = g_Keyboard_device->Acquire();
-	if (FAILED(hr)) return hr;
-
-	return S_OK;
-}
-
-void ReadInputStates()   //void means dont return anything
-{
-	HRESULT hr;
-	hr = g_Keyboard_device->GetDeviceState(sizeof(g_keyboard_keys_state), (LPVOID)&g_keyboard_keys_state);
-
-	if (FAILED(hr))
-	{
-		if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED))
-			g_Keyboard_device->Acquire();
-	}
-}
-
-bool IsKeyPressed(unsigned char DI_keycode)
-{
-	return g_keyboard_keys_state[DI_keycode] & 0x80;
-}
-
-
-void Key_Logic()
-{
-	//close the program
-	if (IsKeyPressed(DIK_ESCAPE))
-		DestroyWindow(g_hWnd);
-
-	//change positions X,Z
-	if (IsKeyPressed(DIK_D))
-	{
-		g_model_player->SetXPos(0.005f);
-		
-	}
-	if (IsKeyPressed(DIK_A))
-	{
-		g_model_player->SetXPos(-0.005f);
-		
-	}
-	if (IsKeyPressed(DIK_W))
-	{
-		g_model_player->SetZPos(0.005f);
-		camera_player->Forward(0.005f);
-	}
-	if (IsKeyPressed(DIK_S))
-	{
-		g_model_player->SetZPos(-0.005f);
-		camera_player->Forward(-0.005f);
-	}
-	
-	if (IsKeyPressed(DIK_E))
-	{
-		
-		view = camera_ai->GetViewMatrix();
-	}
-	
-	if (IsKeyPressed(DIK_Q))
-	{
-		view = camera_player->GetViewMatrix();
-	}
-
-	//position y
-	if (IsKeyPressed(DIK_UP))
-		g_model_player->SetYPos(0.005f);
-	if (IsKeyPressed(DIK_DOWN))
-		g_model_player->SetYPos(-0.005f);
-
-	//change rotation
-	if (IsKeyPressed(DIK_LEFT))
-		g_model_player->SetXRot(0.005f);
-	if (IsKeyPressed(DIK_RIGHT))
-		g_model_player->SetYRot(0.005f);
-
-	//change scaling
-	if (IsKeyPressed(DIK_0))
-	{
-		g_model_player->SetScale(0.0005f);
-		g_model_ai->SetScale(0.0005f);
-	}
-
-	if (IsKeyPressed(DIK_1))
-	{
-		g_model_player->SetScale(-0.0005f);
-		g_model_ai->SetScale(-0.0005f);
-	}
-
-
 }
 
 
@@ -662,124 +507,6 @@ HRESULT InitialiseGraphics()
 
 	return S_OK;
 }
-void RenderFrame(void)
-{
-	// Clear the back buffer - choose a colour you like
-	float rgba_clear_colour[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
-	g_pImmediateContext->ClearRenderTargetView(g_pBackBufferRTView, rgba_clear_colour);
-	g_pImmediateContext->ClearDepthStencilView(g_pZBuffer, D3D11_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0);
-
-
-	//read input
-	ReadInputStates();
-	Key_Logic();
-	//UINT stride = sizeof(g_model_player);
-	//UINT offset = 0;
-	//g_pImmediateContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
-	//g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pConstantBuffer0);
-
-
-	// RENDER HERE
-	//XMMATRIX projection, world, view;
-	projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0), 640.0 / 480.0, 1.0f, 100.0f);
-	g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	
-
-	g_directionla_light_shines_from = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
-	g_directional_light_colour = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
-	g_ambient_light_colour = XMVectorSet(0.1f, 0.1f, 0.1f, 1.0f);
-
-
-
- //  // setting the textures
-	//g_pImmediateContext->PSSetSamplers(0, 1, &g_pSampler);
-	//g_pImmediateContext->PSSetShaderResources(0, 1, &g_pTexture_player);
-	////set the shader objects as active
-	//g_pImmediateContext->VSSetShader(g_pVertexShader, 0, 0);
-	//g_pImmediateContext->PSSetShader(g_pPixelShader, 0, 0);
-	//g_pImmediateContext->IASetInputLayout(g_pInputLayout);
-	
-	
-	//view = XMMatrixIdentity();
-
-	//use the camera to view
-	view = camera_ai->GetViewMatrix();
-
-	camera_player->LookAt_XZ(g_model_player->GetXPos(), g_model_player->GetZPos());
-
-
-	g_model_ai->LookAt_XZ(g_model_flag->GetXPos(), g_model_flag->GetZPos());
-	g_model_ai->MoveForward(0.003f);
-	
-
-	camera_ai->LookAt_XZ(g_model_ai->GetXPos(), g_model_ai->GetZPos());
-
-
-
-
-
-	if (g_model_ai->CheckCollision(g_model_player))
-	{
-		g_model_ai->MoveForward(-0.5f);
-		camera_ai->Forward(0.000f);
-	}
-	else
-	{
-		camera_ai->Forward(0.003f);
-	}
-		
-
-	if (g_model_flag->CheckCollision(g_model_ai))
-		g_model_ai->MoveForward(-0.5f);
-
-
-	if (g_model_flag->CheckCollision(g_model_player))
-		g_model_player->MoveForward(-0.5f);
-
-
-
-	for (int i = 0; i < 50; i++)
-	{
-		if (g_model_gold[i]->CheckCollision(g_model_player))
-		{
-			money += 1;
-			g_model_gold[i]->SetDraw(false);
-		}
-	}
-
-	
-	for (int i = 0; i < 40; i++)
-	{
-		if (g_model_tree[i]->CheckCollision(g_model_player))
-		{
-			g_model_player->MoveForward(-0.5f);
-		}
-	}
-
-
-
-	g_model_player->Draw(&view, &projection);
-	g_model_ai->Draw(&view, &projection);
-	g_model_flag->Draw(&view, &projection);
-
-	for (int i = 0; i < 50; i++){if (g_model_gold[i]->GetDraw() == true){g_model_gold[i]->Draw(&view, &projection);}}
-	for (int i = 0; i < 40; i++){	g_model_tree[i]->Draw(&view, &projection);}
-
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//g_timer->AddText("timer", -1.0, -0.7, .2);
-	//g_timer->RenderText();
-
-	//g_moneyCount->AddText("g_moneyCount", 1.0, -0.7, .2);
-	//g_moneyCount->RenderText();
-
-
-	// Display what has just been rendered
-	g_pSwapChain->Present(0, 0);
-
-
-}
-
-
 
 
 

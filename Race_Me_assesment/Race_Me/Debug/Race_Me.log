@@ -87,10 +87,12 @@ c:\program files (x86)\microsoft directx sdk (june 2010)\include\xnamath.h(2754)
   c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
 e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(241): warning C4244: '=': conversion from 'UINT' to 'FLOAT', possible loss of data
 e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(242): warning C4244: '=': conversion from 'UINT' to 'FLOAT', possible loss of data
-e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(576): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(583): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(589): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(658): warning C4101: 'ms': unreferenced local variable
-e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(683): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(577): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(584): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(590): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(659): warning C4101: 'ms': unreferenced local variable
+e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(685): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(770): warning C4305: 'argument': truncation from 'double' to 'float'
+e:\solent\assesment\agp\race_me_assesment\race_me\main.cpp(773): warning C4305: 'argument': truncation from 'double' to 'float'
   Race_Me.vcxproj -> E:\solent\assesment\AGP\Race_Me_assesment\Race_Me\Debug\Race_Me.exe
   Race_Me.vcxproj -> E:\solent\assesment\AGP\Race_Me_assesment\Race_Me\Debug\Race_Me.pdb (Partial PDB)

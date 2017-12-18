@@ -255,7 +255,7 @@ void Model::CalculateBoundingSphereRadius()
 	// set bounding sphere radius with calculated maximum distance
 	if (total_distance >= m_radius)
 	{
-		m_radius = total_distance;
+		m_radius =sqrt(total_distance);
 	}
 }
 void Model::Draw(XMMATRIX* view, XMMATRIX* projection)

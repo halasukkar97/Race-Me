@@ -53,6 +53,8 @@ void camera::LookAt_XZ(float x, float z)
 	Rotate(m_yangle-f);
 }
 
+void camera::SetCameraAI(bool Stop_camera_ai) { m_StopCameraAi = Stop_camera_ai; }
+bool camera::GeCameraAI() { return m_StopCameraAi; }
 
 
 void camera::Up(float heigh)
