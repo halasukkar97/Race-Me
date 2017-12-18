@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include"Model.h"
 #include "camera.h"
+#include "text2D.h"
 #include <dinput.h>  //for input
 #define _XM_NO_INTRINSICS_
 #define XM_NO_ALIGNMENT
@@ -47,12 +48,21 @@ ID3D11SamplerState*         g_pSampler;
 Model*                      g_model_player;
 Model*                      g_model_ai;
 Model*                      g_model_flag;
-Model*                      g_model_gold[15];
-Model*                      g_model_tree[20];
+Model*                      g_model_gold[50];
+Model*                      g_model_tree[40];
 
 //adding camera source file
-camera*						camera1;
+camera*						camera_player;
+camera*						camera_ai;
 
+//adding text
+Text2D* g_timer;
+Text2D* g_moneyCount;
+
+//adding lights
+XMVECTOR g_directionla_light_shines_from;
+XMVECTOR g_directional_light_colour;
+XMVECTOR g_ambient_light_colour;
 
 
 //adding input
@@ -70,15 +80,15 @@ struct POS_COL_TEX_NORM_VERTEX
 	XMFLOAT3 Normal;
 };
 
-////const buffer structs. pack to 16 bytes. dont let any single element cross a 16 byte boundary 
-//struct CONSTANT_BUFFER0
-//{
-//	XMMATRIX WorldViewProjection; //64 bytes ( 4x4 = 16 floats x 4 bytes)
-//	XMVECTOR directional_light_vector; //16 bytes
-//	XMVECTOR directional_light_colour; //16 bytes
-//	XMVECTOR ambient_light_colour; //16 bytes
-//								   // TOTAL SIZE = 112 BYTES
-//};
+
+struct CONSTANT_BUFFER0
+{
+	XMMATRIX WorldViewProjection; //64 bytes ( 4x4 = 16 floats x 4 bytes)
+	XMVECTOR directional_light_vector; //16 bytes
+	XMVECTOR directional_light_colour; //16 bytes
+	XMVECTOR ambient_light_colour; //16 bytes
+								   // TOTAL SIZE = 112 BYTES
+};
 
 HINSTANCE	g_hInst = NULL;
 HWND		g_hWnd = NULL;
@@ -94,8 +104,8 @@ HRESULT InitialiseGraphics(void);
 HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-//CONSTANT_BUFFER0 cb0_values;
-//CONSTANT_BUFFER0 cb0_values2;
+CONSTANT_BUFFER0 cb_values;
+CONSTANT_BUFFER0 cb_values2;
 
 HRESULT Initialise_Input();
 void ReadInputStates();
@@ -107,6 +117,9 @@ void RenderFrame(void);
 void ShutdownD3D();
 
 int  money = 0;
+
+XMMATRIX projection, world, view;
+
 ///////////////////////////////////////////////////////////////////////////////////
 // Create D3D device and swap chain
 //////////////////////////////////////////////////////////////////////////////////////
@@ -172,8 +185,9 @@ HRESULT InitialiseD3D()
 
 	// Get pointer to back buffer texture
 	ID3D11Texture2D *pBackBufferTexture;
-	hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D),
-		(LPVOID*)&pBackBufferTexture);
+	hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D),(LPVOID*)&pBackBufferTexture);
+	
+
 
 	if (FAILED(hr)) return hr;
 
@@ -231,6 +245,10 @@ HRESULT InitialiseD3D()
 
 	g_pImmediateContext->RSSetViewports(1, &viewport);
 
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	/*g_timer = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
+	g_moneyCount = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
+*/
 
 	return S_OK;
 }
@@ -259,21 +277,25 @@ void ShutdownD3D()
 	delete g_model_ai;
 	delete g_model_flag;
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		delete g_model_gold[i];
 	}
 
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 40; i++)
 	{
 		delete g_model_tree[i];
 	}
 
 
 	//delete camera
-	delete camera1;
+	delete camera_player;
+	delete camera_ai;
 
+	//delete text
+	delete g_timer;
+	delete g_moneyCount;
 
 	//delete keyboard 
 	if (g_Keyboard_device)
@@ -421,15 +443,24 @@ void Key_Logic()
 	if (IsKeyPressed(DIK_W))
 	{
 		g_model_player->SetZPos(0.005f);
-		camera1->Forward(0.005f);
+		camera_player->Forward(0.005f);
 	}
 	if (IsKeyPressed(DIK_S))
 	{
 		g_model_player->SetZPos(-0.005f);
-		camera1->Forward(-0.005f);
+		camera_player->Forward(-0.005f);
 	}
-		
 	
+	if (IsKeyPressed(DIK_E))
+	{
+		
+		view = camera_ai->GetViewMatrix();
+	}
+	
+	if (IsKeyPressed(DIK_Q))
+	{
+		view = camera_player->GetViewMatrix();
+	}
 
 	//position y
 	if (IsKeyPressed(DIK_UP))
@@ -443,11 +474,19 @@ void Key_Logic()
 	if (IsKeyPressed(DIK_RIGHT))
 		g_model_player->SetYRot(0.005f);
 
-	//change scale
+	//change scaling
 	if (IsKeyPressed(DIK_0))
+	{
 		g_model_player->SetScale(0.0005f);
+		g_model_ai->SetScale(0.0005f);
+	}
+
 	if (IsKeyPressed(DIK_1))
+	{
 		g_model_player->SetScale(-0.0005f);
+		g_model_ai->SetScale(-0.0005f);
+	}
+
 
 }
 
@@ -474,7 +513,7 @@ HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
 
 	// Create window
 	g_hInst = hInstance;
-	RECT rc = { 0, 0, 640, 480 };
+	RECT rc = { 0, 0, 1500, 800 };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 	g_hWnd = CreateWindow(Name, g_TutorialName, WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left,
@@ -531,7 +570,7 @@ HRESULT InitialiseGraphics()
 	g_model_player->LoadObjModel("assets/cube.obj");
 
 	//load model sphere
-	g_model_ai= new Model(g_pD3DDevice, g_pImmediateContext,10,0,30);
+	g_model_ai= new Model(g_pD3DDevice, g_pImmediateContext,5,0,0);
 	g_model_ai->LoadObjModel("assets/cube.obj");
 
 	//load flag
@@ -540,13 +579,13 @@ HRESULT InitialiseGraphics()
 
 
 	//load model gold
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		g_model_gold[i] = new Model(g_pD3DDevice, g_pImmediateContext, rand() % 100, 0, rand() % 100);
 		g_model_gold[i]->LoadObjModel("assets/cube.obj");
 	}
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 40; i++)
 	{
 		g_model_tree[i] = new Model(g_pD3DDevice, g_pImmediateContext, rand() % 100, 0, rand() % 100);
 		g_model_tree[i]->LoadObjModel("assets/cube.obj");
@@ -575,7 +614,8 @@ HRESULT InitialiseGraphics()
 	g_pD3DDevice->CreateSamplerState(&sampler_desc, &g_pSampler);
 
 	// adding the camera and values 
-	camera1 = new camera(0, 5, -15, 0);
+	camera_player = new camera(0, 5, -15, 0);
+	camera_ai = new camera(5, 5, -18, 0);
 
 	//adding the texture from the assets file
 	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/playerCar.jpg", NULL, NULL, &g_pTexture_player, NULL);
@@ -589,12 +629,12 @@ HRESULT InitialiseGraphics()
 	g_model_ai->set_sampler(g_pSampler);
 	g_model_flag->set_sampler(g_pSampler);
 	
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		g_model_gold[i]->set_sampler(g_pSampler);
 	}
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 40; i++)
 	{
 		g_model_tree[i]->set_sampler(g_pSampler);
 	}
@@ -604,12 +644,12 @@ HRESULT InitialiseGraphics()
 	g_model_ai->set_texture(g_pTexture_ai);
 	g_model_flag->set_texture(g_pTexture_flag);
 	
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		g_model_gold[i]->set_texture(g_pTexture_gold);
 	}
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 40; i++)
 	{
 		g_model_tree[i]->set_texture(g_pTexture_tree);
 	}
@@ -633,26 +673,61 @@ void RenderFrame(void)
 	//read input
 	ReadInputStates();
 	Key_Logic();
-
+	//UINT stride = sizeof(g_model_player);
+	//UINT offset = 0;
+	//g_pImmediateContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
+	//g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pConstantBuffer0);
 
 
 	// RENDER HERE
-	XMMATRIX projection, world, view;
+	//XMMATRIX projection, world, view;
 	projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0), 640.0 / 480.0, 1.0f, 100.0f);
 	g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
+
+	g_directionla_light_shines_from = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+	g_directional_light_colour = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+	g_ambient_light_colour = XMVectorSet(0.1f, 0.1f, 0.1f, 1.0f);
+
+
+
+ //  // setting the textures
+	//g_pImmediateContext->PSSetSamplers(0, 1, &g_pSampler);
+	//g_pImmediateContext->PSSetShaderResources(0, 1, &g_pTexture_player);
+	////set the shader objects as active
+	//g_pImmediateContext->VSSetShader(g_pVertexShader, 0, 0);
+	//g_pImmediateContext->PSSetShader(g_pPixelShader, 0, 0);
+	//g_pImmediateContext->IASetInputLayout(g_pInputLayout);
+	
+	
 	//view = XMMatrixIdentity();
 
 	//use the camera to view
-	view = camera1->GetViewMatrix();
+	view = camera_ai->GetViewMatrix();
+
+	camera_player->LookAt_XZ(g_model_player->GetXPos(), g_model_player->GetZPos());
 
 
 	g_model_ai->LookAt_XZ(g_model_flag->GetXPos(), g_model_flag->GetZPos());
-	g_model_ai->MoveForward(0.001f);
+	g_model_ai->MoveForward(0.003f);
 	
-	camera1->LookAt_XZ(g_model_player->GetXPos(), g_model_player->GetZPos());
+
+	camera_ai->LookAt_XZ(g_model_ai->GetXPos(), g_model_ai->GetZPos());
+
+
+
+
 
 	if (g_model_ai->CheckCollision(g_model_player))
+	{
 		g_model_ai->MoveForward(-0.5f);
+		camera_ai->Forward(0.000f);
+	}
+	else
+	{
+		camera_ai->Forward(0.003f);
+	}
+		
 
 	if (g_model_flag->CheckCollision(g_model_ai))
 		g_model_ai->MoveForward(-0.5f);
@@ -663,7 +738,7 @@ void RenderFrame(void)
 
 
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		if (g_model_gold[i]->CheckCollision(g_model_player))
 		{
@@ -673,7 +748,7 @@ void RenderFrame(void)
 	}
 
 	
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 40; i++)
 	{
 		if (g_model_tree[i]->CheckCollision(g_model_player))
 		{
@@ -687,10 +762,15 @@ void RenderFrame(void)
 	g_model_ai->Draw(&view, &projection);
 	g_model_flag->Draw(&view, &projection);
 
-	for (int i = 0; i < 15; i++){if (g_model_gold[i]->GetDraw() == true){g_model_gold[i]->Draw(&view, &projection);}}
-	for (int i = 0; i < 20; i++){	g_model_tree[i]->Draw(&view, &projection);}
+	for (int i = 0; i < 50; i++){if (g_model_gold[i]->GetDraw() == true){g_model_gold[i]->Draw(&view, &projection);}}
+	for (int i = 0; i < 40; i++){	g_model_tree[i]->Draw(&view, &projection);}
 
-	
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//g_timer->AddText("timer", -1.0, -0.7, .2);
+	//g_timer->RenderText();
+
+	//g_moneyCount->AddText("g_moneyCount", 1.0, -0.7, .2);
+	//g_moneyCount->RenderText();
 
 
 	// Display what has just been rendered
