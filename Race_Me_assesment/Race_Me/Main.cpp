@@ -26,24 +26,6 @@ ID3D11Device*				g_pD3DDevice = NULL;
 
 Input*                       input;
 
-//define vertex structure
-struct POS_COL_TEX_NORM_VERTEX
-{
-	XMFLOAT3 Pos;
-	XMFLOAT4 Col;
-	XMFLOAT2 Texture0;
-	XMFLOAT3 Normal;
-};
-
-
-struct CONSTANT_BUFFER0
-{
-	XMMATRIX WorldViewProjection; //64 bytes ( 4x4 = 16 floats x 4 bytes)
-	XMVECTOR directional_light_vector; //16 bytes
-	XMVECTOR directional_light_colour; //16 bytes
-	XMVECTOR ambient_light_colour; //16 bytes
-								   // TOTAL SIZE = 112 BYTES
-};
 
 HINSTANCE	g_hInst = NULL;
 HWND		g_hWnd = NULL;
@@ -54,16 +36,12 @@ char		g_TutorialName[100] = "";
 ///////////////////////////////////////////////////////////////////////////////////////////
 //	Forward declarations
 /////////////////////////////////////////////////////////////////////////////////////////
-HRESULT InitialiseGraphics(void);
 
-HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 CONSTANT_BUFFER0 cb_values;
 CONSTANT_BUFFER0 cb_values2;
 
-
-HRESULT InitialiseD3D();
 
 void ShutdownD3D();
 
