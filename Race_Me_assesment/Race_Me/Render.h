@@ -49,6 +49,10 @@ public:
 	Text2D*  timer;
 	Text2D*  moneyCount;
 
+	void RenderFrame();
+	~Render();
+
+
 private:
 
 	//addding input
@@ -67,5 +71,15 @@ private:
 	HINSTANCE					hInst = NULL;
 	HWND						hWnd = NULL;
 	
+
+	void ClearBackBuffer();
+	void SetLighting();
+	void SetVertexBuffer();
+	void SetShaderObjects();
+	void SetTextures();
+	void SetMovment();
+	void checkCollisions();
+	void ShowText();
+	void Draw();
 
 };
