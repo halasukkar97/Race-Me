@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "Model.h"
 #include "camera.h"
+#include "text2D.h"
 #include "Input.h"
 #define _XM_NO_INTINSICS_
 #define XM_NO_ALIGNMENT
@@ -76,6 +77,10 @@ private:
 
 	//adding input
 	Input*                       input;
+
+	//adding text
+	Text2D*  timer;
+	Text2D*  moneyCount;
 
 	//CONSTANT_LightBuffer cb_values;
 	//CONSTANT_LightBuffer cb_values2;

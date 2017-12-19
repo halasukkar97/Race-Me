@@ -128,8 +128,8 @@ pImmediateContext->OMSetRenderTargets(1, &pBackBufferRTView, pZBuffer);
 	pImmediateContext->RSSetViewports(1, &viewport);
 
 
-	timer = new Text2D("assets/font1.bmp", g_pD3DDevice, pImmediateContext);
-	moneyCount = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
+	timer = new Text2D("assets/font1.bmp", pD3DDevice, pImmediateContext);
+	moneyCount = new Text2D("assets/font1.bmp", pD3DDevice, pImmediateContext);
 
 
 	return S_OK;
@@ -181,18 +181,6 @@ void GameManagment::ShutdownD3D()
 	//delete text
 	delete timer;
 	delete moneyCount;
-
-	//delete keyboard 
-	if (_Input->g_Keyboard_device)
-	{
-		_Input->g_Keyboard_device->Unacquire();
-		_Input->g_Keyboard_device->Release();
-	}
-
-
-
-	//delete input
-	if (_Input->g_direct_input)_Input->g_direct_input->Release();
 
 	//delete model objects texture
 	if (pTexture_player)pTexture_player->Release();

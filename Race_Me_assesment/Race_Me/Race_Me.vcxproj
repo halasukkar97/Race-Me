@@ -125,8 +125,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="GameManagment.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -136,8 +136,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameManagment.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="objfilemodel.h" />
