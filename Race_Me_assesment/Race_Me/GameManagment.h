@@ -5,18 +5,22 @@
 #include <dxerr.h>
 #include <stdio.h>
 #include "Model.h"
-#include "camera.h"
+#include"Render.h"
+//#include "camera.h"
 #include "text2D.h"
 #include "Input.h"
 #define _XM_NO_INTINSICS_
 #define XM_NO_ALIGNMENT
 #include <xnamath.h>
 
+
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
 class GameManagment {
 
 public:
 
-	HRESULT InitialiseGraphics(void);
+	HRESULT InitialiseGraphics(Input* input);
 	HRESULT InitialiseD3D();
 	HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow);
 	void ShutdownD3D();
@@ -24,9 +28,13 @@ public:
 	GameManagment();
 	~GameManagment();
 	
+	Render* render;
+	void Render();
 
 private:
 	char		GameName[100] = "RaceMe";
+
+
 
 	HINSTANCE   hInst;
 	HWND	    hWnd;
@@ -48,7 +56,7 @@ private:
 	ID3D11PixelShader*			pPixelShader;
 	ID3D11InputLayout*			pInputLayout;
 	ID3D11RenderTargetView*		pBackBufferRTView = NULL;
-	ID3D11DeviceContext*        pImmediateContext;
+	
 
 
 	//adding textures and sampler
@@ -72,8 +80,8 @@ private:
 	Model*                      model_tree[40];
 
 	//adding camera source file
-	camera*						camera_player;
-	camera*						camera_ai;
+	//camera*						camera_player;
+	//camera*						camera_ai;
 
 	//adding input
 	Input*                       input;

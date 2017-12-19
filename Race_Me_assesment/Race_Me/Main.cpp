@@ -10,7 +10,6 @@ GameManagment*		gameManagment;
 Input*				input;
 Render*				render;
 
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 //////////////////////////////////////////////////////////////////////////////////////
 // Entry point to the program. Initializes everything and goes into a message processing 
@@ -18,6 +17,10 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 //////////////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	gameManagment = new GameManagment();
+	input = new Input();
+	render = new Render();
+
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -27,11 +30,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
-	if (FAILED(input->Initialise_Input()))
-	{
-		DXTRACE_MSG("Failed to create Input");
-		return 0;
-	}
 
 	if (FAILED(gameManagment->InitialiseD3D()))
 	{
@@ -41,7 +39,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	//call initialiserGraphics
-	if (FAILED(gameManagment->InitialiseGraphics()))
+	if (FAILED(gameManagment->InitialiseGraphics(input)))
 	{
 		DXTRACE_MSG("Failed to initialise graphics");
 		return 0;
@@ -59,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else
 		{
-			render->RenderFrame();
+			gameManagment->Render();
 		}
 	}
 

@@ -3,13 +3,14 @@
 //////////////////////////////////////////////////////////////////////////////////////
 // Initialise input 
 //////////////////////////////////////////////////////////////////////////////////////
-HRESULT Input::Initialise_Input()
+HRESULT Input::Initialise_Input(HINSTANCE hInst,HWND hWnd)
 {
 	HRESULT hr;
 	ZeroMemory(keyboard_keys_state, sizeof(keyboard_keys_state));
 
 	hr = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&direct_input, NULL);
 	if (FAILED(hr)) return hr;
+
 
 	hr = direct_input->CreateDevice(GUID_SysKeyboard, &Keyboard_device, NULL);
 	if (FAILED(hr)) return hr;
@@ -46,8 +47,8 @@ void Input::Clean()
 
 
 	//delete camera
-	delete camera_player;
-	delete camera_ai;
+	//delete camera_player;
+	//delete camera_ai;
 
 	//delete keyboard 
 	if (Keyboard_device)
@@ -109,12 +110,12 @@ void  Input::Key_Logic()
 	if (IsKeyPressed(DIK_W))
 	{
 		model_player->SetZPos(0.005f);
-		camera_player->Forward(0.005f);
+		//camera_player->Forward(0.005f);
 	}
 	if (IsKeyPressed(DIK_S))
 	{
 		model_player->SetZPos(-0.005f);
-		camera_player->Forward(-0.005f);
+		//camera_player->Forward(-0.005f);
 	}
 
 	/*if (IsKeyPressed(DIK_E))

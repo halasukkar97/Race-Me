@@ -1,7 +1,7 @@
 #pragma once
 #include <dinput.h> 
 #include"Model.h"
-#include"camera.h"
+//#include"camera.h"
 
 class Input{
 private:
@@ -14,8 +14,8 @@ private:
 	Model*                      model_tree[40];
 
 	//adding camera source file
-	camera*						camera_player;
-	camera*						camera_ai;
+//	camera*						camera_player;
+//	camera*						camera_ai;
 
 	HINSTANCE	hInst = NULL;
 	HWND		hWnd = NULL;
@@ -29,7 +29,7 @@ public:
 	void ReadInputStates();
 	bool IsKeyPressed(unsigned char DI_keycode);
 	void Key_Logic();
-	HRESULT Initialise_Input();
+	HRESULT Initialise_Input(HINSTANCE hInst, HWND hWnd);
 
 
 	//adding input

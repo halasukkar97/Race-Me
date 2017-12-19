@@ -52,14 +52,14 @@ void Render::SetShaderObjects()
 void Render::SetMovment(){
 
 	//make the player camera following the player car
-	camera_player->LookAt_XZ(model_player->GetXPos(), model_player->GetZPos());
+//	camera_player->LookAt_XZ(model_player->GetXPos(), model_player->GetZPos());
 
 	//make the ai car look and go to flag
 	model_ai->LookAt_XZ(model_flag->GetXPos(), model_flag->GetZPos());
 	model_ai->MoveForward(0.003f);
 
 	//make ai camera follow ai car
-	camera_ai->LookAt_XZ(model_ai->GetXPos(), model_ai->GetZPos());
+//	camera_ai->LookAt_XZ(model_ai->GetXPos(), model_ai->GetZPos());
 
 }
 
@@ -67,13 +67,14 @@ void Render::checkCollisions()
 {
 	//if the ai go to flag make it go back a step and stop the camera from moving 
 	if (model_ai->CheckCollision(model_flag))
+
 	{
 		model_ai->MoveForward(-0.5f);
-		camera_ai->Forward(0.000f);
+		//camera_ai->Forward(0.000f);
 	}
 	else //if the ai is not there yet make the ai camera follow the ai car
 	{
-		camera_ai->Forward(0.003f);
+		//camera_ai->Forward(0.003f);
 	}
 
 	//check for collision between model ai and flag and make ai go a step back
@@ -136,7 +137,7 @@ void Render::Clean()
 }
 
 
-void Render::RenderFrame()
+void Render::RenderFrame(ID3D11DeviceContext* pImmediateContext, ID3D11RenderTargetView* pBackBufferRTView, ID3D11DepthStencilView*  pZBuffer, IDXGISwapChain*	pSwapChain)
 {
 	ClearBackBuffer();
 
@@ -151,7 +152,7 @@ void Render::RenderFrame()
 	SetShaderObjects();
 
 	//use the camera to view
-	view = camera_player->GetViewMatrix();
+	//view = camera_player->GetViewMatrix();
 
 	//calling the functions
 	SetMovment();

@@ -1,7 +1,7 @@
 #pragma once
 #include"Model.h"
 #include"GameManagment.h"
-#include "camera.h"
+//#include "camera.h"
 #include "text2D.h"
 #include "Input.h"
 
@@ -22,7 +22,7 @@ public:
 	ID3D11PixelShader*			pPixelShader;
 	ID3D11InputLayout*			pInputLayout;
 	ID3D11RenderTargetView*		pBackBufferRTView = NULL;
-	ID3D11DeviceContext*        pImmediateContext;
+
 
 
 	//adding textures and sampler
@@ -39,7 +39,6 @@ public:
 	XMVECTOR ambient_light_colour;
 
 	GameManagment* gameManagment;
-	void RenderFrame();
 	int  money = 0;
 
 	XMMATRIX projection, world, view;
@@ -48,7 +47,7 @@ public:
 	Text2D*  timer;
 	Text2D*  moneyCount;
 
-	void RenderFrame();
+	void RenderFrame(ID3D11DeviceContext* pImmediateContext, ID3D11RenderTargetView* pBackBufferRTView, ID3D11DepthStencilView*  pZBuffer, IDXGISwapChain*	pSwapChain);
 	~Render();
 
 
@@ -64,8 +63,8 @@ private:
 	Model*                      model_tree[40];
 
 	//adding camera source file
-	camera*						camera_player;
-	camera*						camera_ai;
+	//camera*						camera_player;
+	//camera*						camera_ai;
 
 	HINSTANCE					hInst = NULL;
 	HWND						hWnd = NULL;

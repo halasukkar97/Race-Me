@@ -2,6 +2,9 @@
 
 int (WINAPIV * __vsnprintf_s)(char *, size_t, const char*, va_list) = _vsnprintf;
 
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////
 // Create D3D device and swap chain
 //////////////////////////////////////////////////////////////////////////////////////
@@ -175,8 +178,8 @@ void GameManagment::ShutdownD3D()
 
 
 	//delete camera
-	delete camera_player;
-	delete camera_ai;
+	//delete camera_player;
+	//delete camera_ai;
 
 	//delete text
 	delete timer;
@@ -205,6 +208,12 @@ GameManagment::~GameManagment()
 {
 }
 
+void GameManagment::Render()
+{
+
+	render->RenderFrame(pImmediateContext, pBackBufferRTView, pZBuffer, pSwapChain);
+
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -242,6 +251,8 @@ HRESULT GameManagment::InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
 	return S_OK;
 }
 
+
+
 //////////////////////////////////////////////////////////////////////////////////////
 // Called every time the application receives a message
 //////////////////////////////////////////////////////////////////////////////////////
@@ -277,9 +288,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 //init graphics
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT GameManagment::InitialiseGraphics()
+HRESULT GameManagment::InitialiseGraphics(Input* input)
 {
 	HRESULT hr = S_OK;
+
+	input->Initialise_Input(hInst, hWnd);
 
 	//load model player
 	model_player = new Model(pD3DDevice, pImmediateContext, 0, 0, 0);
@@ -330,8 +343,8 @@ HRESULT GameManagment::InitialiseGraphics()
 	pD3DDevice->CreateSamplerState(&sampler_desc, &pSampler);
 
 	// adding the camera and values 
-	camera_player = new camera(0, 5, -15, 0);
-	camera_ai = new camera(5, 5, -18, 0);
+	//camera_player = new camera(0, 5, -15, 0);
+	//camera_ai = new camera(5, 5, -18, 0);
 
 	//adding the texture from the assets file
 	D3DX11CreateShaderResourceViewFromFile(pD3DDevice, "assets/playerCar.jpg", NULL, NULL, &pTexture_player, NULL);
