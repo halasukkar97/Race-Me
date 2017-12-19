@@ -26,12 +26,49 @@ HRESULT Input::Initialise_Input()
 	return S_OK;
 }
 
+void Input::Clean()
+{
+	//delete objects
+	delete model_player;
+	delete model_ai;
+	delete model_flag;
+
+	for (int i = 0; i < 50; i++)
+	{
+		delete model_gold[i];
+	}
+
+
+	for (int i = 0; i < 40; i++)
+	{
+		delete model_tree[i];
+	}
+
+
+	//delete camera
+	delete camera_player;
+	delete camera_ai;
+
+	//delete keyboard 
+	if (Keyboard_device)
+	{
+		Keyboard_device->Unacquire();
+		Keyboard_device->Release();
+	}
+
+	//delete input
+	if (direct_input)direct_input->Release();
+
+}
+
 Input::Input()
 {
+
 }
 
 Input::~Input()
 {
+	Clean();
 }
 
 void  Input::ReadInputStates()

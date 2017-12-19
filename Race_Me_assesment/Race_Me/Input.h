@@ -4,21 +4,7 @@
 #include"camera.h"
 
 class Input{
-
-public:
-	//Input();
-	//~Input();
-
-	void ReadInputStates();
-	bool IsKeyPressed(unsigned char DI_keycode);
-	void Key_Logic();
-	HRESULT Initialise_Input();
-
-
-	//adding input
-	IDirectInput8*			    g_direct_input;
-	IDirectInputDevice8*	    g_Keyboard_device;
-	unsigned char			    g_keyboard_keys_state[256];
+private:
 
 	//adding model source file
 	Model*                      model_player;
@@ -33,6 +19,23 @@ public:
 
 	HINSTANCE	hInst = NULL;
 	HWND		hWnd = NULL;
+
+	void Clean();
+
+public:
+	Input();
+	~Input();
+
+	void ReadInputStates();
+	bool IsKeyPressed(unsigned char DI_keycode);
+	void Key_Logic();
+	HRESULT Initialise_Input();
+
+
+	//adding input
+	IDirectInput8*			    direct_input;
+	IDirectInputDevice8*	    Keyboard_device;
+	unsigned char			    keyboard_keys_state[256];
 
 
 
