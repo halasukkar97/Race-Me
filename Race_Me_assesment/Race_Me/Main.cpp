@@ -1,14 +1,12 @@
 #include"GameManagment.h"
-#include "camera.h"
-#include "text2D.h"
 #include "Input.h"
-#include "Render.h"
+
 
 
 
 GameManagment*		gameManagment;
 Input*				input;
-Render*				render;
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -19,7 +17,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	gameManagment = new GameManagment();
 	input = new Input();
-	render = new Render();
+	
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);

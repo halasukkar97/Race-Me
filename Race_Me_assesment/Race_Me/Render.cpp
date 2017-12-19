@@ -5,6 +5,11 @@ Render::~Render()
 	Clean();
 }
 
+Render::Render()
+{
+
+}
+
 void Render::ClearBackBuffer()
 {
 	// Clear the back buffer and set the background color

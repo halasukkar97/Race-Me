@@ -1,6 +1,5 @@
 #pragma once
 #include"Model.h"
-#include"GameManagment.h"
 //#include "camera.h"
 #include "text2D.h"
 #include "Input.h"
@@ -38,7 +37,7 @@ public:
 	XMVECTOR directional_light_colour;
 	XMVECTOR ambient_light_colour;
 
-	GameManagment* gameManagment;
+
 	int  money = 0;
 
 	XMMATRIX projection, world, view;
@@ -49,6 +48,7 @@ public:
 
 	void RenderFrame(ID3D11DeviceContext* pImmediateContext, ID3D11RenderTargetView* pBackBufferRTView, ID3D11DepthStencilView*  pZBuffer, IDXGISwapChain*	pSwapChain);
 	~Render();
+	Render();
 
 
 private:

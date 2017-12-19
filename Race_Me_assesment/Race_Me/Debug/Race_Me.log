@@ -88,9 +88,9 @@ c:\program files (x86)\microsoft directx sdk (june 2010)\include\xnamath.h(2754)
 c:\github\race-me\race_me_assesment\race_me\gamemanagment.h(31): error C2143: syntax error: missing ';' before '*'
 c:\github\race-me\race_me_assesment\race_me\gamemanagment.h(31): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
 c:\github\race-me\race_me_assesment\race_me\gamemanagment.h(31): error C2238: unexpected token(s) preceding ';'
-c:\github\race-me\race_me_assesment\race_me\render.cpp(33): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
-c:\github\race-me\race_me_assesment\race_me\render.cpp(113): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\github\race-me\race_me_assesment\race_me\render.cpp(117): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\github\race-me\race_me_assesment\race_me\render.cpp(38): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+c:\github\race-me\race_me_assesment\race_me\render.cpp(118): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\github\race-me\race_me_assesment\race_me\render.cpp(122): warning C4305: 'argument': truncation from 'double' to 'float'
   Main.cpp
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\shared\winerror.h(52937): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
@@ -269,9 +269,10 @@ c:\program files (x86)\microsoft directx sdk (june 2010)\include\xnamath.h(2754)
 c:\github\race-me\race_me_assesment\race_me\render.h(41): error C2143: syntax error: missing ';' before '*'
 c:\github\race-me\race_me_assesment\race_me\render.h(41): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
 c:\github\race-me\race_me_assesment\race_me\render.h(41): error C2238: unexpected token(s) preceding ';'
-c:\github\race-me\race_me_assesment\race_me\gamemanagment.cpp(126): warning C4244: '=': conversion from 'UINT' to 'FLOAT', possible loss of data
 c:\github\race-me\race_me_assesment\race_me\gamemanagment.cpp(127): warning C4244: '=': conversion from 'UINT' to 'FLOAT', possible loss of data
-c:\github\race-me\race_me_assesment\race_me\gamemanagment.cpp(306): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\github\race-me\race_me_assesment\race_me\gamemanagment.cpp(313): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\github\race-me\race_me_assesment\race_me\gamemanagment.cpp(128): warning C4244: '=': conversion from 'UINT' to 'FLOAT', possible loss of data
+c:\github\race-me\race_me_assesment\race_me\gamemanagment.cpp(207): error C2061: syntax error: identifier 'Render'
+c:\github\race-me\race_me_assesment\race_me\gamemanagment.cpp(312): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 c:\github\race-me\race_me_assesment\race_me\gamemanagment.cpp(319): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\github\race-me\race_me_assesment\race_me\gamemanagment.cpp(325): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
   Generating Code...

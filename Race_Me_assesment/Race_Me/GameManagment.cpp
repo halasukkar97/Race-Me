@@ -1,5 +1,6 @@
 #include "GameManagment.h"
 
+
 int (WINAPIV * __vsnprintf_s)(char *, size_t, const char*, va_list) = _vsnprintf;
 
 
@@ -202,6 +203,10 @@ void GameManagment::ShutdownD3D()
 
 GameManagment::GameManagment()
 {
+
+	render = new Render();
+
+
 }
 
 GameManagment::~GameManagment()
@@ -210,6 +215,7 @@ GameManagment::~GameManagment()
 
 void GameManagment::Render()
 {
+
 
 	render->RenderFrame(pImmediateContext, pBackBufferRTView, pZBuffer, pSwapChain);
 
