@@ -2,7 +2,7 @@
 
 Render::~Render()
 {
-
+	Clean();
 }
 
 void Render::ClearBackBuffer()
@@ -130,6 +130,11 @@ void Render::Draw()
 	for (int i = 0; i < 40; i++) { model_tree[i]->Draw(&view, &projection); }
 
 }
+
+void Render::Clean()
+{
+}
+
 
 void Render::RenderFrame()
 {

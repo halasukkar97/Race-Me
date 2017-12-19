@@ -81,5 +81,6 @@ private:
 	void checkCollisions();
 	void ShowText();
 	void Draw();
+	void Clean();
 
 };
