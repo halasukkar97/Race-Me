@@ -6,41 +6,49 @@
 HRESULT Input::Initialise_Input()
 {
 	HRESULT hr;
-	ZeroMemory(g_keyboard_keys_state, sizeof(g_keyboard_keys_state));
+	ZeroMemory(keyboard_keys_state, sizeof(keyboard_keys_state));
 
-	hr = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&g_direct_input, NULL);
+	hr = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&direct_input, NULL);
 	if (FAILED(hr)) return hr;
 
-	hr = g_direct_input->CreateDevice(GUID_SysKeyboard, &g_Keyboard_device, NULL);
+	hr = direct_input->CreateDevice(GUID_SysKeyboard, &Keyboard_device, NULL);
 	if (FAILED(hr)) return hr;
 
-	hr = g_Keyboard_device->SetDataFormat(&c_dfDIKeyboard);
+	hr = Keyboard_device->SetDataFormat(&c_dfDIKeyboard);
 	if (FAILED(hr)) return hr;
 
-	hr = g_Keyboard_device->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	hr = Keyboard_device->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	if (FAILED(hr)) return hr;
 
-	hr = g_Keyboard_device->Acquire();
+	hr = Keyboard_device->Acquire();
 	if (FAILED(hr)) return hr;
 
 	return S_OK;
 }
 
+Input::Input()
+{
+}
+
+Input::~Input()
+{
+}
+
 void  Input::ReadInputStates()
 {
 	HRESULT hr;
-	hr = g_Keyboard_device->GetDeviceState(sizeof(g_keyboard_keys_state), (LPVOID)&g_keyboard_keys_state);
+	hr = Keyboard_device->GetDeviceState(sizeof(keyboard_keys_state), (LPVOID)&keyboard_keys_state);
 
 	if (FAILED(hr))
 	{
 		if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED))
-			g_Keyboard_device->Acquire();
+			Keyboard_device->Acquire();
 	}
 }
 
 bool  Input::IsKeyPressed(unsigned char DI_keycode)
 {
-	return g_keyboard_keys_state[DI_keycode] & 0x80;
+	return keyboard_keys_state[DI_keycode] & 0x80;
 }
 
 

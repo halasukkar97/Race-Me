@@ -1,15 +1,16 @@
 #include "GameManagment.h"
 
+int (WINAPIV * __vsnprintf_s)(char *, size_t, const char*, va_list) = _vsnprintf;
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Create D3D device and swap chain
 //////////////////////////////////////////////////////////////////////////////////////
-HRESULT InitialiseD3D()
+HRESULT GameManagment::InitialiseD3D()
 {
 	HRESULT hr = S_OK;
 
 	RECT rc;
-	GetClientRect(g_hWnd, &rc);
+	GetClientRect(hWnd, &rc);
 	UINT width = rc.right - rc.left;
 	UINT height = rc.bottom - rc.top;
 
@@ -44,18 +45,18 @@ HRESULT InitialiseD3D()
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.OutputWindow = g_hWnd;
+	sd.OutputWindow = hWnd;
 	sd.SampleDesc.Count = 1;
 	sd.SampleDesc.Quality = 0;
 	sd.Windowed = true;
 
 	for (UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
 	{
-		g_driverType = driverTypes[driverTypeIndex];
-		hr = D3D11CreateDeviceAndSwapChain(NULL, g_driverType, NULL,
+		driverType = driverTypes[driverTypeIndex];
+		hr = D3D11CreateDeviceAndSwapChain(NULL, driverType, NULL,
 			createDeviceFlags, featureLevels, numFeatureLevels,
-			D3D11_SDK_VERSION, &sd, &g_pSwapChain,
-			&g_pD3DDevice, &g_featureLevel, &g_pImmediateContext);
+			D3D11_SDK_VERSION, &sd, &pSwapChain,
+			&pD3DDevice, &featureLevel, &pImmediateContext);
 		if (SUCCEEDED(hr))
 			break;
 	}
@@ -66,15 +67,15 @@ HRESULT InitialiseD3D()
 
 	// Get pointer to back buffer texture
 	ID3D11Texture2D *pBackBufferTexture;
-	hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBufferTexture);
+	hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBufferTexture);
 
 
 
 	if (FAILED(hr)) return hr;
 
 	// Use the back buffer texture pointer to create the render target view
-	hr = g_pD3DDevice->CreateRenderTargetView(pBackBufferTexture, NULL,
-		&g_pBackBufferRTView);
+	hr = pD3DDevice->CreateRenderTargetView(pBackBufferTexture, NULL,
+		&pBackBufferRTView);
 	pBackBufferTexture->Release();
 
 	if (FAILED(hr)) return hr;
@@ -94,7 +95,7 @@ HRESULT InitialiseD3D()
 
 
 	ID3D11Texture2D *pZBufferTexture;
-	hr = g_pD3DDevice->CreateTexture2D(&tex2dDesc, NULL, &pZBufferTexture);
+	hr = pD3DDevice->CreateTexture2D(&tex2dDesc, NULL, &pZBufferTexture);
 
 	if (FAILED(hr)) return hr;
 
@@ -106,13 +107,13 @@ HRESULT InitialiseD3D()
 	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
 
-	g_pD3DDevice->CreateDepthStencilView(pZBufferTexture, &dsvDesc, &g_pZBuffer);
+	pD3DDevice->CreateDepthStencilView(pZBufferTexture, &dsvDesc, &pZBuffer);
 	pZBufferTexture->Release();
 
 
 
 	// Set the render target view
-	g_pImmediateContext->OMSetRenderTargets(1, &g_pBackBufferRTView, g_pZBuffer);
+pImmediateContext->OMSetRenderTargets(1, &pBackBufferRTView, pZBuffer);
 
 	// Set the viewport
 	D3D11_VIEWPORT viewport;
@@ -124,11 +125,11 @@ HRESULT InitialiseD3D()
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 
-	g_pImmediateContext->RSSetViewports(1, &viewport);
+	pImmediateContext->RSSetViewports(1, &viewport);
 
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	g_timer = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
-	g_moneyCount = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
+
+	timer = new Text2D("assets/font1.bmp", g_pD3DDevice, pImmediateContext);
+	moneyCount = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
 
 
 	return S_OK;
@@ -140,36 +141,36 @@ HRESULT InitialiseD3D()
 //////////////////////////////////////////////////////////////////////////////////////
 // Clean up D3D objects
 //////////////////////////////////////////////////////////////////////////////////////
-void ShutdownD3D()
+void GameManagment::ShutdownD3D()
 {
 	//deleting vertex buffer , input layout,vertex shader , pixel shader
-	if (g_pVertexBuffer) g_pVertexBuffer->Release();
-	if (g_pInputLayout)g_pInputLayout->Release();
-	if (g_pVertexShader)g_pVertexShader->Release();
-	if (g_pPixelShader)g_pPixelShader->Release();
+	if (pVertexBuffer)pVertexBuffer->Release();
+	if (pInputLayout)pInputLayout->Release();
+	if (pVertexShader)pVertexShader->Release();
+	if (pPixelShader)pPixelShader->Release();
 
 	//delete back bufferTRview
-	if (g_pBackBufferRTView) g_pBackBufferRTView->Release();
+	if (pBackBufferRTView) pBackBufferRTView->Release();
 
 	//delete swapchain , constan buffer, immediat context
-	if (g_pSwapChain) g_pSwapChain->Release();
-	if (g_pConstantBuffer0) g_pConstantBuffer0->Release();
-	if (g_pImmediateContext) g_pImmediateContext->Release();
+	if (pSwapChain) pSwapChain->Release();
+	if (pConstantBuffer0) pConstantBuffer0->Release();
+	if (pImmediateContext) pImmediateContext->Release();
 
 	//delete objects
-	delete g_model_player;
-	delete g_model_ai;
-	delete g_model_flag;
+	delete model_player;
+	delete model_ai;
+	delete model_flag;
 
 	for (int i = 0; i < 50; i++)
 	{
-		delete g_model_gold[i];
+		delete model_gold[i];
 	}
 
 
 	for (int i = 0; i < 40; i++)
 	{
-		delete g_model_tree[i];
+		delete model_tree[i];
 	}
 
 
@@ -178,8 +179,8 @@ void ShutdownD3D()
 	delete camera_ai;
 
 	//delete text
-	delete g_timer;
-	delete g_moneyCount;
+	delete timer;
+	delete moneyCount;
 
 	//delete keyboard 
 	if (_Input->g_Keyboard_device)
@@ -194,18 +195,26 @@ void ShutdownD3D()
 	if (_Input->g_direct_input)_Input->g_direct_input->Release();
 
 	//delete model objects texture
-	if (g_pTexture_player)  g_pTexture_player->Release();
-	if (g_pTexture_ai)  g_pTexture_ai->Release();
-	if (g_pTexture_flag)  g_pTexture_flag->Release();
-	if (g_pTexture_gold)  g_pTexture_gold->Release();
-	if (g_pTexture_tree)  g_pTexture_tree->Release();
+	if (pTexture_player)pTexture_player->Release();
+	if (pTexture_ai) pTexture_ai->Release();
+	if (pTexture_flag) pTexture_flag->Release();
+	if (pTexture_gold) pTexture_gold->Release();
+	if (pTexture_tree) pTexture_tree->Release();
 
 
 	//delete sampler
-	if (g_pSampler)  g_pSampler->Release();
+	if (pSampler)  pSampler->Release();
 
 	//delete this project
-	if (g_pD3DDevice) g_pD3DDevice->Release();
+	if (pD3DDevice) pD3DDevice->Release();
+}
+
+GameManagment::GameManagment()
+{
+}
+
+GameManagment::~GameManagment()
+{
 }
 
 
@@ -213,7 +222,7 @@ void ShutdownD3D()
 //////////////////////////////////////////////////////////////////////////////////////
 // Register class and create window
 //////////////////////////////////////////////////////////////////////////////////////
-HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
+HRESULT GameManagment::InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
 {
 	// Give your app window your own name
 	char Name[100] = "Tutorial 10 Exercise 01\0";
@@ -231,16 +240,16 @@ HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
 	if (!RegisterClassEx(&wcex)) return E_FAIL;
 
 	// Create window
-	g_hInst = hInstance;
+	hInst = hInstance;
 	RECT rc = { 0, 0, 1500, 800 };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-	g_hWnd = CreateWindow(Name, g_TutorialName, WS_OVERLAPPEDWINDOW,
+	hWnd = CreateWindow(Name, GameName, WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left,
 		rc.bottom - rc.top, NULL, NULL, hInstance, NULL);
-	if (!g_hWnd)
+	if (!hWnd)
 		return E_FAIL;
 
-	ShowWindow(g_hWnd, nCmdShow);
+	ShowWindow(hWnd, nCmdShow);
 
 	return S_OK;
 }
@@ -266,7 +275,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_KEYDOWN:
 		if (wParam == VK_ESCAPE)
-			DestroyWindow(g_hWnd);
+			DestroyWindow(hWnd);
 		return 0;
 
 	default:
@@ -280,34 +289,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 //init graphics
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT InitialiseGraphics()
+HRESULT GameManagment::InitialiseGraphics()
 {
 	HRESULT hr = S_OK;
 
 	//load model player
-	g_model_player = new Model(g_pD3DDevice, g_pImmediateContext, 0, 0, 0);
-	g_model_player->LoadObjModel("assets/cube.obj");
+	model_player = new Model(pD3DDevice, pImmediateContext, 0, 0, 0);
+	model_player->LoadObjModel("assets/cube.obj");
 
 	//load model sphere
-	g_model_ai = new Model(g_pD3DDevice, g_pImmediateContext, 5, 0, 0);
-	g_model_ai->LoadObjModel("assets/cube.obj");
+	model_ai = new Model(pD3DDevice, pImmediateContext, 5, 0, 0);
+	model_ai->LoadObjModel("assets/cube.obj");
 
 	//load flag
-	g_model_flag = new Model(g_pD3DDevice, g_pImmediateContext, rand() % 100, 0, rand() % 100);
-	g_model_flag->LoadObjModel("assets/cube.obj");
+	model_flag = new Model(pD3DDevice, pImmediateContext, rand() % 100, 0, rand() % 100);
+	model_flag->LoadObjModel("assets/cube.obj");
 
 
 	//load model gold
 	for (int i = 0; i < 50; i++)
 	{
-		g_model_gold[i] = new Model(g_pD3DDevice, g_pImmediateContext, rand() % 100, 0, rand() % 100);
-		g_model_gold[i]->LoadObjModel("assets/cube.obj");
+		model_gold[i] = new Model(pD3DDevice, pImmediateContext, rand() % 100, 0, rand() % 100);
+		model_gold[i]->LoadObjModel("assets/cube.obj");
 	}
 
 	for (int i = 0; i < 40; i++)
 	{
-		g_model_tree[i] = new Model(g_pD3DDevice, g_pImmediateContext, rand() % 100, 0, rand() % 100);
-		g_model_tree[i]->LoadObjModel("assets/cube.obj");
+		model_tree[i] = new Model(pD3DDevice, pImmediateContext, rand() % 100, 0, rand() % 100);
+		model_tree[i]->LoadObjModel("assets/cube.obj");
 	}
 
 	////create constant buffer //04-1
@@ -330,47 +339,47 @@ HRESULT InitialiseGraphics()
 	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	g_pD3DDevice->CreateSamplerState(&sampler_desc, &g_pSampler);
+	pD3DDevice->CreateSamplerState(&sampler_desc, &pSampler);
 
 	// adding the camera and values 
 	camera_player = new camera(0, 5, -15, 0);
 	camera_ai = new camera(5, 5, -18, 0);
 
 	//adding the texture from the assets file
-	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/playerCar.jpg", NULL, NULL, &g_pTexture_player, NULL);
-	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/aiCar.png", NULL, NULL, &g_pTexture_ai, NULL);
-	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/gold.jpg", NULL, NULL, &g_pTexture_gold, NULL);
-	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/tree.jpg", NULL, NULL, &g_pTexture_tree, NULL);
-	D3DX11CreateShaderResourceViewFromFile(g_pD3DDevice, "assets/endpoint.png", NULL, NULL, &g_pTexture_flag, NULL);
+	D3DX11CreateShaderResourceViewFromFile(pD3DDevice, "assets/playerCar.jpg", NULL, NULL, &pTexture_player, NULL);
+	D3DX11CreateShaderResourceViewFromFile(pD3DDevice, "assets/aiCar.png", NULL, NULL, &pTexture_ai, NULL);
+	D3DX11CreateShaderResourceViewFromFile(pD3DDevice, "assets/gold.jpg", NULL, NULL, &pTexture_gold, NULL);
+	D3DX11CreateShaderResourceViewFromFile(pD3DDevice, "assets/tree.jpg", NULL, NULL, &pTexture_tree, NULL);
+	D3DX11CreateShaderResourceViewFromFile(pD3DDevice, "assets/endpoint.png", NULL, NULL, &pTexture_flag, NULL);
 
 	//set the samplers
-	g_model_player->set_sampler(g_pSampler);
-	g_model_ai->set_sampler(g_pSampler);
-	g_model_flag->set_sampler(g_pSampler);
+	model_player->set_sampler(pSampler);
+	model_ai->set_sampler(pSampler);
+	model_flag->set_sampler(pSampler);
 
 	for (int i = 0; i < 50; i++)
 	{
-		g_model_gold[i]->set_sampler(g_pSampler);
+		model_gold[i]->set_sampler(pSampler);
 	}
 
 	for (int i = 0; i < 40; i++)
 	{
-		g_model_tree[i]->set_sampler(g_pSampler);
+		model_tree[i]->set_sampler(pSampler);
 	}
 
 	// setting the textures
-	g_model_player->set_texture(g_pTexture_player);
-	g_model_ai->set_texture(g_pTexture_ai);
-	g_model_flag->set_texture(g_pTexture_flag);
+	model_player->set_texture(pTexture_player);
+	model_ai->set_texture(pTexture_ai);
+	model_flag->set_texture(pTexture_flag);
 
 	for (int i = 0; i < 50; i++)
 	{
-		g_model_gold[i]->set_texture(g_pTexture_gold);
+		model_gold[i]->set_texture(pTexture_gold);
 	}
 
 	for (int i = 0; i < 40; i++)
 	{
-		g_model_tree[i]->set_texture(g_pTexture_tree);
+		model_tree[i]->set_texture(pTexture_tree);
 	}
 
 
