@@ -23,7 +23,7 @@ public:
 	ID3D11PixelShader*			pPixelShader;
 	ID3D11InputLayout*			pInputLayout;
 	ID3D11RenderTargetView*		pBackBufferRTView = NULL;
-
+	ID3D11DeviceContext*        pImmediateContext;
 
 
 	//adding textures and sampler
@@ -40,7 +40,7 @@ public:
 	XMVECTOR ambient_light_colour;
 
 
-	void RenderFrame(ID3D11DeviceContext* pImmediateContext);
+	void RenderFrame();
 	int  money = 0;
 
 	XMMATRIX projection, world, view;
