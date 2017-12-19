@@ -1,5 +1,6 @@
 #pragma once
 #include"Model.h"
+#include"GameManagment.h"
 #include "camera.h"
 #include "text2D.h"
 #include "Input.h"
@@ -8,36 +9,36 @@ class Render {
 
 public:
 
-	//ID3D11DeviceContext*		pImmediateContext = NULL;
-	//IDXGISwapChain*				pSwapChain = NULL;
+	ID3D11DeviceContext*		pImmediateContext = NULL;
+	IDXGISwapChain*				pSwapChain = NULL;
 
-	////adding constant buffer and z buffer
-	//ID3D11Buffer*				pConstantBuffer0;
-	//ID3D11DepthStencilView*     pZBuffer;
+	//adding constant buffer and z buffer
+	ID3D11Buffer*				pConstantBuffer0;
+	ID3D11DepthStencilView*     pZBuffer;
 
-	////adding vertex buffer and shader, pixel shader and input layout
-	//ID3D11Buffer*				pVertexBuffer;
-	//ID3D11VertexShader*			pVertexShader;
-	//ID3D11PixelShader*			pPixelShader;
-	//ID3D11InputLayout*			pInputLayout;
-	//ID3D11RenderTargetView*		pBackBufferRTView = NULL;
-	//ID3D11DeviceContext*        pImmediateContext;
-
-
-	////adding textures and sampler
-	//ID3D11ShaderResourceView*   pTexture_player;
-	//ID3D11ShaderResourceView*   pTexture_ai;
-	//ID3D11ShaderResourceView*   pTexture_gold;
-	//ID3D11ShaderResourceView*   pTexture_tree;
-	//ID3D11ShaderResourceView*   pTexture_flag;
-	//ID3D11SamplerState*         pSampler;
-
-	////adding lights
-	//XMVECTOR directionla_light_shines_from;
-	//XMVECTOR directional_light_colour;
-	//XMVECTOR ambient_light_colour;
+	//adding vertex buffer and shader, pixel shader and input layout
+	ID3D11Buffer*				pVertexBuffer;
+	ID3D11VertexShader*			pVertexShader;
+	ID3D11PixelShader*			pPixelShader;
+	ID3D11InputLayout*			pInputLayout;
+	ID3D11RenderTargetView*		pBackBufferRTView = NULL;
+	ID3D11DeviceContext*        pImmediateContext;
 
 
+	//adding textures and sampler
+	ID3D11ShaderResourceView*   pTexture_player;
+	ID3D11ShaderResourceView*   pTexture_ai;
+	ID3D11ShaderResourceView*   pTexture_gold;
+	ID3D11ShaderResourceView*   pTexture_tree;
+	ID3D11ShaderResourceView*   pTexture_flag;
+	ID3D11SamplerState*         pSampler;
+
+	//adding lights
+	XMVECTOR directionla_light_shines_from;
+	XMVECTOR directional_light_colour;
+	XMVECTOR ambient_light_colour;
+
+	GameManagment* gameManagment;
 	void RenderFrame();
 	int  money = 0;
 
