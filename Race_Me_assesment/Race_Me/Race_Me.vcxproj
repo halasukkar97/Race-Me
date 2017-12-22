@@ -124,30 +124,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="camera.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GameManagment.cpp" />
-    <ClCompile Include="GameState.cpp" />
-    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="objfilemodel.cpp" />
-    <ClCompile Include="Render.cpp" />
     <ClCompile Include="text2D.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="camera.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="GameManagment.h" />
-    <ClInclude Include="GameState.h" />
-    <ClInclude Include="Input.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="objfilemodel.h" />
-    <ClInclude Include="Render.h" />
     <ClInclude Include="text2D.h" />
   </ItemGroup>
   <ItemGroup>
@@ -156,10 +142,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="shader.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="text2D_shaders.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
