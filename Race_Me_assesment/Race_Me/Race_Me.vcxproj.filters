@@ -48,5 +48,8 @@
   <ItemGroup>
     <FxCompile Include="shader.hlsl" />
     <FxCompile Include="model_shaders.hlsl" />
+    <FxCompile Include="text2D_shaders.hlsl">
+      <Filter>Source Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
