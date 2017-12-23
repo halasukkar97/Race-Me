@@ -708,36 +708,66 @@ void RenderFrame(void)
 	//use the camera to view
 	view = camera_ai->GetViewMatrix();
 
+	//make the camera look at the player
 	camera_player->LookAt_XZ(g_model_player->GetXPos(), g_model_player->GetZPos());
 
-
+	//make the ai car look at the flag and go towerd it
 	g_model_ai->LookAt_XZ(g_model_flag->GetXPos(), g_model_flag->GetZPos());
 	g_model_ai->MoveForward(0.003f);
 	
-
+	//camera ai look at ai car
 	camera_ai->LookAt_XZ(g_model_ai->GetXPos(), g_model_ai->GetZPos());
 
+	//keep the time going
 	watch += 1;
 
 
-
-	if (g_model_ai->CheckCollision(g_model_player))
+	// that ai car touch the flag
+	if (g_model_ai->CheckCollision(g_model_flag))
 	{
-		g_model_ai->MoveForward(-0.5f);
+		//stop the ai and the camera movement
+		g_model_ai->MoveForward(0.0f);
 		camera_ai->Forward(0.000f);
 	}
 	else
 	{
+		//keep the camera moving
 		camera_ai->Forward(0.003f);
 	}
 		
-
+	//if the flag touch the ai car stop the ai car from moving
 	if (g_model_flag->CheckCollision(g_model_ai))
-		g_model_ai->MoveForward(-0.5f);
+	{
+		//stop the ai and the camera movement
+		g_model_ai->MoveForward(0.0f);
+		camera_ai->Forward(0.000f);
 
+	}
+		
 
+	//if the flag touches the player stop the player from moving an the camera
 	if (g_model_flag->CheckCollision(g_model_player))
-		g_model_player->MoveForward(-0.5f);
+	{
+		g_model_player->MoveForward(0.0f);
+		camera_player->Forward(0.000f);
+	}
+		
+	// if the player touch the ai car 
+	if (g_model_player->CheckCollision(g_model_ai))
+	{
+			//move the ai car and the camera a little bit to the right
+		g_model_ai->SetXPos(0.5f);
+		camera_ai->SetXPos(0.5f);
+	}
+
+	// if the ai touch the player car 
+	if (g_model_ai->CheckCollision(g_model_player))
+	{
+		//move the ai car and the camera a little bit to the right
+		g_model_ai->SetXPos(0.5f);
+		camera_ai->SetXPos(0.5f);
+	}
+		
 
 
 
@@ -754,7 +784,7 @@ void RenderFrame(void)
 	{
 		if (g_model_gold[i]->CheckCollision(g_model_ai))
 		{
-			money += 1;
+			ai_mony += 1;
 			g_model_gold[i]->SetDraw(false);
 		}
 	}
@@ -773,20 +803,22 @@ void RenderFrame(void)
 	{
 		if (g_model_tree[i]->CheckCollision(g_model_ai))
 		{
-			g_model_ai->MoveForward(-0.5f);
+			g_model_ai->SetXPos(0.5f);
+			camera_ai->SetXPos(0.5f);
 		}
 	}
 
 
-
+	//draw the player and ai and flag
 	g_model_player->Draw(&view, &projection);
 	g_model_ai->Draw(&view, &projection);
 	g_model_flag->Draw(&view, &projection);
 
+	//draw 50 gold and 40 trees
 	for (int i = 0; i < 50; i++){if (g_model_gold[i]->GetDraw() == true){g_model_gold[i]->Draw(&view, &projection);}}
 	for (int i = 0; i < 40; i++){	g_model_tree[i]->Draw(&view, &projection);}
 
-	
+	//wright on the screen the time and money amount
 	g_timer->AddText("time is : " + std::to_string(watch / 1000.0), -1.0, 1, .1);
 	g_timer->RenderText();
 
