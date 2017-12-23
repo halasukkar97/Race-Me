@@ -74,6 +74,11 @@ XMMATRIX camera::GetViewMatrix()
 }
 
 
+void camera::SetXPos(float x) { m_x += x; }
+void camera::SetYPos(float y) { m_y += y; }
+void camera::SetZPos(float z) { m_z += z; }
+
+
 float camera::Getx()
 
 {

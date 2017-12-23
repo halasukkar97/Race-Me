@@ -40,6 +40,11 @@ public:
 	//Create Up method that has one floating point parameter
 	void Up(float heigh);
 
+
+	void SetXPos(float x);
+	void SetYPos(float y);
+	void SetZPos(float z);
+
 	float Getx();
 	float Gety();
 	float Getz();
