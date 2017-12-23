@@ -116,7 +116,9 @@ HRESULT InitialiseD3D();
 void RenderFrame(void);
 void ShutdownD3D();
 
+float deltaTime = 0.0;
 int  money = 0;
+int countdown = 50;
 
 XMMATRIX projection, world, view;
 
@@ -245,10 +247,10 @@ HRESULT InitialiseD3D()
 
 	g_pImmediateContext->RSSetViewports(1, &viewport);
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	/*g_timer = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
+
+	g_timer = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
 	g_moneyCount = new Text2D("assets/font1.bmp", g_pD3DDevice, g_pImmediateContext);
-*/
+
 
 	return S_OK;
 }
@@ -673,10 +675,10 @@ void RenderFrame(void)
 	//read input
 	ReadInputStates();
 	Key_Logic();
-	//UINT stride = sizeof(g_model_player);
-	//UINT offset = 0;
-	//g_pImmediateContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
-	//g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pConstantBuffer0);
+	UINT stride = sizeof(g_model_player);
+	UINT offset = 0;
+	g_pImmediateContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
+	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pConstantBuffer0);
 
 
 	// RENDER HERE
@@ -691,13 +693,13 @@ void RenderFrame(void)
 
 
 
- //  // setting the textures
-	//g_pImmediateContext->PSSetSamplers(0, 1, &g_pSampler);
-	//g_pImmediateContext->PSSetShaderResources(0, 1, &g_pTexture_player);
-	////set the shader objects as active
-	//g_pImmediateContext->VSSetShader(g_pVertexShader, 0, 0);
-	//g_pImmediateContext->PSSetShader(g_pPixelShader, 0, 0);
-	//g_pImmediateContext->IASetInputLayout(g_pInputLayout);
+   // setting the textures
+	g_pImmediateContext->PSSetSamplers(0, 1, &g_pSampler);
+	g_pImmediateContext->PSSetShaderResources(0, 1, &g_pTexture_player);
+	//set the shader objects as active
+	g_pImmediateContext->VSSetShader(g_pVertexShader, 0, 0);
+	g_pImmediateContext->PSSetShader(g_pPixelShader, 0, 0);
+	g_pImmediateContext->IASetInputLayout(g_pInputLayout);
 	
 	
 	//view = XMMatrixIdentity();
@@ -714,7 +716,7 @@ void RenderFrame(void)
 
 	camera_ai->LookAt_XZ(g_model_ai->GetXPos(), g_model_ai->GetZPos());
 
-
+	countdown -= 1;
 
 
 
@@ -765,12 +767,12 @@ void RenderFrame(void)
 	for (int i = 0; i < 50; i++){if (g_model_gold[i]->GetDraw() == true){g_model_gold[i]->Draw(&view, &projection);}}
 	for (int i = 0; i < 40; i++){	g_model_tree[i]->Draw(&view, &projection);}
 
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//g_timer->AddText("timer", -1.0, -0.7, .2);
-	//g_timer->RenderText();
+	
+	g_timer->AddText("time" + std::to_string(countdown), -1.0, 1, .1);
+	g_timer->RenderText();
 
-	//g_moneyCount->AddText("g_moneyCount", 1.0, -0.7, .2);
-	//g_moneyCount->RenderText();
+	g_moneyCount->AddText("money"+ std::to_string(money), -1.0, -0.9, .1);
+	g_moneyCount->RenderText();
 
 
 	// Display what has just been rendered
