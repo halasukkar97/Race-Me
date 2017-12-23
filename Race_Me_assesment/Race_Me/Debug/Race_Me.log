@@ -85,14 +85,14 @@ c:\program files (x86)\microsoft directx sdk (june 2010)\include\xnamath.h(2742)
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\xnamath.h(2743): warning C4838: conversion from 'unsigned int' to 'INT' requires a narrowing conversion
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\xnamath.h(2754): warning C4838: conversion from 'unsigned int' to 'INT' requires a narrowing conversion
   c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
-c:\github\race-me\race_me_assesment\race_me\main.cpp(242): warning C4244: '=': conversion from 'UINT' to 'FLOAT', possible loss of data
-c:\github\race-me\race_me_assesment\race_me\main.cpp(243): warning C4244: '=': conversion from 'UINT' to 'FLOAT', possible loss of data
-c:\github\race-me\race_me_assesment\race_me\main.cpp(578): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\github\race-me\race_me_assesment\race_me\main.cpp(585): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\github\race-me\race_me_assesment\race_me\main.cpp(591): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\github\race-me\race_me_assesment\race_me\main.cpp(660): warning C4101: 'ms': unreferenced local variable
-c:\github\race-me\race_me_assesment\race_me\main.cpp(685): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
-c:\github\race-me\race_me_assesment\race_me\main.cpp(770): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\github\race-me\race_me_assesment\race_me\main.cpp(773): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\github\race-me\race_me_assesment\race_me\main.cpp(244): warning C4244: '=': conversion from 'UINT' to 'FLOAT', possible loss of data
+c:\github\race-me\race_me_assesment\race_me\main.cpp(245): warning C4244: '=': conversion from 'UINT' to 'FLOAT', possible loss of data
+c:\github\race-me\race_me_assesment\race_me\main.cpp(580): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\github\race-me\race_me_assesment\race_me\main.cpp(587): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\github\race-me\race_me_assesment\race_me\main.cpp(593): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\github\race-me\race_me_assesment\race_me\main.cpp(662): warning C4101: 'ms': unreferenced local variable
+c:\github\race-me\race_me_assesment\race_me\main.cpp(687): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+c:\github\race-me\race_me_assesment\race_me\main.cpp(782): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\github\race-me\race_me_assesment\race_me\main.cpp(785): warning C4305: 'argument': truncation from 'double' to 'float'
   Race_Me.vcxproj -> C:\GitHub\Race-Me\Race_Me_assesment\Race_Me\Debug\Race_Me.exe
   Race_Me.vcxproj -> C:\GitHub\Race-Me\Race_Me_assesment\Race_Me\Debug\Race_Me.pdb (Partial PDB)
