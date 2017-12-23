@@ -118,7 +118,8 @@ void ShutdownD3D();
 
 float deltaTime = 0.0;
 int  money = 0;
-int countdown = 50;
+int ai_mony = 0;
+int watch = 0;
 
 XMMATRIX projection, world, view;
 
@@ -716,7 +717,7 @@ void RenderFrame(void)
 
 	camera_ai->LookAt_XZ(g_model_ai->GetXPos(), g_model_ai->GetZPos());
 
-	countdown -= 1;
+	watch += 1;
 
 
 
@@ -749,12 +750,30 @@ void RenderFrame(void)
 		}
 	}
 
+	for (int i = 0; i < 50; i++)
+	{
+		if (g_model_gold[i]->CheckCollision(g_model_ai))
+		{
+			money += 1;
+			g_model_gold[i]->SetDraw(false);
+		}
+	}
+
+
 	
 	for (int i = 0; i < 40; i++)
 	{
 		if (g_model_tree[i]->CheckCollision(g_model_player))
 		{
 			g_model_player->MoveForward(-0.5f);
+		}
+	}
+
+	for (int i = 0; i < 40; i++)
+	{
+		if (g_model_tree[i]->CheckCollision(g_model_ai))
+		{
+			g_model_ai->MoveForward(-0.5f);
 		}
 	}
 
@@ -768,10 +787,10 @@ void RenderFrame(void)
 	for (int i = 0; i < 40; i++){	g_model_tree[i]->Draw(&view, &projection);}
 
 	
-	g_timer->AddText("time" + std::to_string(countdown), -1.0, 1, .1);
+	g_timer->AddText("time is : " + std::to_string(watch / 1000.0), -1.0, 1, .1);
 	g_timer->RenderText();
 
-	g_moneyCount->AddText("money"+ std::to_string(money), -1.0, -0.9, .1);
+	g_moneyCount->AddText("money : "+ std::to_string(money), -1.0, -0.9, .1);
 	g_moneyCount->RenderText();
 
 
