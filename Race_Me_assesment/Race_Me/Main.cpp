@@ -668,7 +668,7 @@ HRESULT InitialiseGraphics()
 void RenderFrame(void)
 {
 	// Clear the back buffer - choose a colour you like
-	float rgba_clear_colour[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	float rgba_clear_colour[4] = { 0.0f, 0.0f, 0.6f, 1.0f };
 	g_pImmediateContext->ClearRenderTargetView(g_pBackBufferRTView, rgba_clear_colour);
 	g_pImmediateContext->ClearDepthStencilView(g_pZBuffer, D3D11_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0);
 
@@ -721,52 +721,39 @@ void RenderFrame(void)
 	//keep the time going
 	watch += 1;
 
-
-	// that ai car touch the flag
-	if (g_model_ai->CheckCollision(g_model_flag))
+		
+	//if the flag touch the ai car stop the ai car from moving
+	if (g_model_flag->CheckCollision(g_model_ai) || g_model_ai->CheckCollision(g_model_flag))
 	{
 		//stop the ai and the camera movement
 		g_model_ai->MoveForward(0.0f);
 		camera_ai->Forward(0.000f);
+
 	}
 	else
 	{
 		//keep the camera moving
 		camera_ai->Forward(0.003f);
 	}
-		
-	//if the flag touch the ai car stop the ai car from moving
-	if (g_model_flag->CheckCollision(g_model_ai))
-	{
-		//stop the ai and the camera movement
-		g_model_ai->MoveForward(0.0f);
-		camera_ai->Forward(0.000f);
 
-	}
 		
 
 	//if the flag touches the player stop the player from moving an the camera
-	if (g_model_flag->CheckCollision(g_model_player))
+	if (g_model_flag->CheckCollision(g_model_player) || g_model_player->CheckCollision(g_model_flag))
 	{
 		g_model_player->MoveForward(0.0f);
 		camera_player->Forward(0.000f);
 	}
 		
 	// if the player touch the ai car 
-	if (g_model_player->CheckCollision(g_model_ai))
+	if (g_model_player->CheckCollision(g_model_ai) || g_model_ai->CheckCollision(g_model_player))
 	{
 			//move the ai car and the camera a little bit to the right
 		g_model_ai->SetXPos(0.5f);
 		camera_ai->SetXPos(0.5f);
 	}
 
-	// if the ai touch the player car 
-	if (g_model_ai->CheckCollision(g_model_player))
-	{
-		//move the ai car and the camera a little bit to the right
-		g_model_ai->SetXPos(0.5f);
-		camera_ai->SetXPos(0.5f);
-	}
+	
 		
 
 
@@ -819,8 +806,50 @@ void RenderFrame(void)
 	for (int i = 0; i < 40; i++){	g_model_tree[i]->Draw(&view, &projection);}
 
 	//wright on the screen the time and money amount
-	g_timer->AddText("time is : " + std::to_string(watch / 1000.0), -1.0, 1, .1);
-	g_timer->RenderText();
+	if (g_model_flag->CheckCollision(g_model_ai) || g_model_ai->CheckCollision(g_model_flag))
+	{
+		g_timer->AddText("you lost", -1.0, 1, .1);
+		g_timer->RenderText();
+		for (int i = 0; i < 6; i++)
+		{
+			i += 1;	
+		}
+		
+			DestroyWindow(g_hWnd);
+		
+
+		
+	}
+	else if (g_model_flag->CheckCollision(g_model_player) || g_model_player->CheckCollision(g_model_flag))
+	{
+
+		g_timer->AddText("you win", -1.0, 1, .1);
+		g_timer->RenderText();
+		//DestroyWindow(g_hWnd);
+		/*for (int i = 0; i < 6; i++)
+		{
+			i += 1;
+
+			if (i == 5)
+			{
+				DestroyWindow(g_hWnd);
+			}
+
+
+		}*/
+		for (int i = 0; i < 6; i++)
+		{
+			i += 1;
+		}
+
+		DestroyWindow(g_hWnd);
+	}
+	else
+	{
+		g_timer->AddText("time is : " + std::to_string(watch / 1000.0), -1.0, 1, .1);
+		g_timer->RenderText();
+	}
+	
 
 	g_moneyCount->AddText("money : "+ std::to_string(money), -1.0, -0.9, .1);
 	g_moneyCount->RenderText();
