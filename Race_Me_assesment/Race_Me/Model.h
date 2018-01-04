@@ -1,28 +1,35 @@
 #pragma once
 #include"ObjFileModel.h"
 
-
+//creating the constant buffer
 struct MODEL_CONSTANT_BUFFER
 {
 	XMMATRIX WorldViewProjection; //64 bytes (4 x 4 = 16 floats x 4 bytes)
 	// total size= 64 bytes
 };
 
+// creating class model
 class  Model {
 public:
+
+	//a constructor that has 5 parameters
 	Model(ID3D11Device* Device, ID3D11DeviceContext* Context, float x, float y, float z);
 	int LoadObjModel(char* filename);
 	void Draw(XMMATRIX* view,XMMATRIX* projection);
 	~Model();
 
+
+	// creating position method with one floating point parameter
     void SetXPos(float x);
 	void SetYPos(float y);
 	void SetZPos(float z);
 
+	// creating Rotate method with one floating point parameter
 	void SetXRot(float xRotation);
 	void SetYRot(float yRotation);
 	void SetZRot(float zRotation);
 
+	// creating scale method with one floating point parameter
 	void SetScale(float scale);
 
 
@@ -36,16 +43,20 @@ public:
 
 	float GetScale();
 
+	//// creating textuer and sampler methods with one floating point parameter
 	void set_texture(ID3D11ShaderResourceView* m_pTexture);
 	void set_sampler(ID3D11SamplerState*   m_pSampler0);
 
 
 	void LookAt_XZ(float x, float z);
+
+	//Create Forward method that has one floating point parameter
 	void MoveForward(float distance);
 	bool CheckCollision(Model* Model);
 
 	XMVECTOR GetBoundingSphereWorldSpacePosition();
 
+	//floats for the collision check 
 	float GetBoundingSphereCentreX();
 	float GetBoundingSphereCentreY();
 	float GetBoundingSphereCentreZ();
