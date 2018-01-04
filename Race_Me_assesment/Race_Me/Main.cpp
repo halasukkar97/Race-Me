@@ -80,7 +80,7 @@ struct POS_COL_TEX_NORM_VERTEX
 	XMFLOAT3 Normal;
 };
 
-
+//creating the constant for the lights
 struct CONSTANT_BUFFER0
 {
 	XMMATRIX WorldViewProjection; //64 bytes ( 4x4 = 16 floats x 4 bytes)
@@ -454,6 +454,8 @@ void Key_Logic()
 		camera_player->Forward(-0.005f);
 	}
 	
+
+	//switch between ai and player cameras
 	if (IsKeyPressed(DIK_E))
 	{
 		OutputDebugString("pressed e");
@@ -703,9 +705,6 @@ void RenderFrame(void)
 	g_pImmediateContext->PSSetShader(g_pPixelShader, 0, 0);
 	g_pImmediateContext->IASetInputLayout(g_pInputLayout);
 	
-	
-	//view = XMMatrixIdentity();
-
 	//use the camera to view
 	view = camera_ai->GetViewMatrix();
 
@@ -758,27 +757,28 @@ void RenderFrame(void)
 		
 
 
-
+	//collect money for player
 	for (int i = 0; i < 50; i++)
 	{
 		if (g_model_gold[i]->CheckCollision(g_model_player))
 		{
-			money += 1;
+			money += 750;
 			g_model_gold[i]->SetDraw(false);
 		}
 	}
 
+	//collect money for AI
 	for (int i = 0; i < 50; i++)
 	{
 		if (g_model_gold[i]->CheckCollision(g_model_ai))
 		{
-			ai_mony += 1;
+			ai_mony += 550;
 			g_model_gold[i]->SetDraw(false);
 		}
 	}
 
 
-	
+	//check tree collition
 	for (int i = 0; i < 40; i++)
 	{
 		if (g_model_tree[i]->CheckCollision(g_model_player))
@@ -806,7 +806,7 @@ void RenderFrame(void)
 	for (int i = 0; i < 50; i++){if (g_model_gold[i]->GetDraw() == true){g_model_gold[i]->Draw(&view, &projection);}}
 	for (int i = 0; i < 40; i++){	g_model_tree[i]->Draw(&view, &projection);}
 
-	//wright on the screen the time and money amount
+	//print on the screen the time and money amount and stop the game 
 	if (g_model_flag->CheckCollision(g_model_ai) || g_model_ai->CheckCollision(g_model_flag))
 	{
 		Sleep(1000);
