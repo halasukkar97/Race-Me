@@ -706,7 +706,7 @@ void RenderFrame(void)
 	g_pImmediateContext->IASetInputLayout(g_pInputLayout);
 	
 	//use the camera to view
-	view = camera_ai->GetViewMatrix();
+	view = camera_player->GetViewMatrix();
 
 	//make the camera look at the player
 	camera_player->LookAt_XZ(g_model_player->GetXPos(), g_model_player->GetZPos());
