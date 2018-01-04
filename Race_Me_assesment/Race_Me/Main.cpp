@@ -456,12 +456,13 @@ void Key_Logic()
 	
 	if (IsKeyPressed(DIK_E))
 	{
-		
+		OutputDebugString("pressed e");
 		view = camera_ai->GetViewMatrix();
 	}
 	
 	if (IsKeyPressed(DIK_Q))
 	{
+		OutputDebugString("pressed q");
 		view = camera_player->GetViewMatrix();
 	}
 
@@ -808,41 +809,19 @@ void RenderFrame(void)
 	//wright on the screen the time and money amount
 	if (g_model_flag->CheckCollision(g_model_ai) || g_model_ai->CheckCollision(g_model_flag))
 	{
+		Sleep(1000);
 		g_timer->AddText("you lost", -1.0, 1, .1);
 		g_timer->RenderText();
-		for (int i = 0; i < 6; i++)
-		{
-			i += 1;	
-		}
 		
-			DestroyWindow(g_hWnd);
-		
-
 		
 	}
 	else if (g_model_flag->CheckCollision(g_model_player) || g_model_player->CheckCollision(g_model_flag))
 	{
-
+		Sleep(1000);
 		g_timer->AddText("you win", -1.0, 1, .1);
 		g_timer->RenderText();
-		//DestroyWindow(g_hWnd);
-		/*for (int i = 0; i < 6; i++)
-		{
-			i += 1;
 
-			if (i == 5)
-			{
-				DestroyWindow(g_hWnd);
-			}
-
-
-		}*/
-		for (int i = 0; i < 6; i++)
-		{
-			i += 1;
-		}
-
-		DestroyWindow(g_hWnd);
+		
 	}
 	else
 	{
