@@ -21,9 +21,10 @@ camera::~camera()
 {
 }
 
+//setting the camera rotation method
 void camera::Rotate(float degree_nummber)
 {
-	
+	//adding the rotation
 	m_camera_rotation += degree_nummber;
 
 	m_dx = sin(m_camera_rotation *(XM_PI / 180.0));
@@ -31,6 +32,7 @@ void camera::Rotate(float degree_nummber)
 
 }
 
+//move the camera forward
 void camera::Forward(float distance)
 {
 	m_x += m_dx * distance;
