@@ -12,3 +12,5 @@ to move the player around user:
                                S:back
                                
  there are two cameras inside but because of the lack of time when i had a problem with switching the camera inside the gameplay mood i couldnt fix it, but before starting the game if we switch the cameras it works just fine.
+
+there is also a video in this Folder showes how the game look like and how it works.
